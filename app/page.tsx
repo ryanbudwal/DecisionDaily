@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AuthGate } from "./AuthGate";
 
 const evidence = [
   { label: "Subscriber growth", value: "+64% YoY", tone: "positive", note: "Domestic subscribers grew rapidly in the prior quarter." },
@@ -34,6 +35,7 @@ export default function Home() {
   }
 
   return (
+    <AuthGate>
     <main>
       <header className="topbar">
         <a className="brand" href="#" aria-label="DecisionLab home"><span>DL</span> DecisionLab</a>
@@ -42,7 +44,6 @@ export default function Home() {
           <a href="#method">How it works</a>
           <a href="#progress">My progress</a>
         </nav>
-        <button className="profile" aria-label="Open profile">RB</button>
       </header>
 
       <section className="workspace" id="scenario">
@@ -133,5 +134,6 @@ export default function Home() {
 
       <footer id="method"><p><strong>DecisionLab</strong> trains process, not prediction.</p><p>Historical scenarios · Transparent scoring · No investment advice</p></footer>
     </main>
+    </AuthGate>
   );
 }
