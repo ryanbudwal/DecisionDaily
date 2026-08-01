@@ -6,7 +6,7 @@ import { AuthGate } from "./AuthGate";
 import { supabase } from "@/lib/supabase";
 
 type Evidence = { label: string; value: string; detail: string; tone: "positive" | "negative" | "neutral" };
-type Category = "economics" | "investing" | "personal-finance" | "real-estate" | "crypto";
+type Category = "economics" | "investing" | "personal-finance" | "business" | "real-estate" | "crypto" | "markets" | "entrepreneurship";
 type Challenge = {
   id: number;
   slug: string;
@@ -37,6 +37,11 @@ type Submission = {
   scoring_breakdown: Record<string, ScorePart>;
   submitted_at: string;
 };
+type ScoreRecord = {
+  submission_id: number;
+  overall_score: number;
+  scoring_breakdown: Record<string, ScorePart>;
+};
 type Outcome = {
   challenge_id: number;
   outcome_title: string;
@@ -52,8 +57,11 @@ const categories: { value: "all" | Category; label: string }[] = [
   { value: "investing", label: "Investing" },
   { value: "economics", label: "Economics" },
   { value: "personal-finance", label: "Personal finance" },
+  { value: "business", label: "Business" },
   { value: "real-estate", label: "Real estate" },
   { value: "crypto", label: "Crypto" },
+  { value: "markets", label: "Markets" },
+  { value: "entrepreneurship", label: "Entrepreneurship" },
 ];
 
 const categoryLabel = (category: Category) => categories.find((item) => item.value === category)?.label ?? category;
@@ -93,20 +101,27 @@ function DailyPlatform() {
   const loadPlatform = useCallback(async () => {
     setLoading(true);
     setError("");
-    const [{ data: userData }, challengeResult, submissionResult] = await Promise.all([
+    const [{ data: userData }, challengeResult, submissionResult, scoreResult] = await Promise.all([
       supabase.auth.getUser(),
       supabase.from("daily_challenges").select("*").order("publish_date", { ascending: false }),
       supabase.from("challenge_submissions").select("*").order("submitted_at", { ascending: false }),
+      supabase.from("scores").select("submission_id, overall_score, scoring_breakdown"),
     ]);
 
-    if (challengeResult.error || submissionResult.error) {
-      setError(challengeResult.error?.message ?? submissionResult.error?.message ?? "Could not load DecisionLab.");
+    if (challengeResult.error || submissionResult.error || scoreResult.error) {
+      setError(challengeResult.error?.message ?? submissionResult.error?.message ?? scoreResult.error?.message ?? "Could not load DecisionLab.");
       setLoading(false);
       return;
     }
 
     const nextChallenges = (challengeResult.data ?? []) as Challenge[];
-    const nextSubmissions = (submissionResult.data ?? []) as Submission[];
+    const scoreBySubmission = new Map(
+      ((scoreResult.data ?? []) as ScoreRecord[]).map((score) => [score.submission_id, score]),
+    );
+    const nextSubmissions = ((submissionResult.data ?? []) as Submission[]).map((submission) => {
+      const score = scoreBySubmission.get(submission.id);
+      return score ? { ...submission, score: score.overall_score, scoring_breakdown: score.scoring_breakdown } : submission;
+    });
     setUser(userData.user);
     setChallenges(nextChallenges);
     setSubmissions(nextSubmissions);
@@ -155,7 +170,16 @@ function DailyPlatform() {
     if (submitError) {
       setError(submitError.code === "23505" ? "This decision is already locked." : submitError.message);
     } else {
-      const saved = data as Submission;
+      let saved = data as Submission;
+      const { data: scoreData } = await supabase
+        .from("scores")
+        .select("submission_id, overall_score, scoring_breakdown")
+        .eq("submission_id", saved.id)
+        .maybeSingle();
+      if (scoreData) {
+        const persistedScore = scoreData as ScoreRecord;
+        saved = { ...saved, score: persistedScore.overall_score, scoring_breakdown: persistedScore.scoring_breakdown };
+      }
       setSubmissions((current) => [saved, ...current.filter((item) => item.challenge_id !== saved.challenge_id)]);
       await loadOutcome(selected.id);
     }

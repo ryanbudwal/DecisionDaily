@@ -27,6 +27,6 @@ The browser is allowed to receive the Supabase URL and publishable key. Security
 
 ## Database
 
-The deployed schema is documented in [`supabase/schema.sql`](supabase/schema.sql). Challenge outcomes are stored separately from prompts so row-level security can keep them hidden until the current user submits. Submissions have no update or delete policy, making each decision append-only and locked.
+The original deployed schema is documented in [`supabase/schema.sql`](supabase/schema.sql), with forward changes recorded under [`supabase/migrations`](supabase/migrations). Challenge outcomes are stored separately from prompts so row-level security can keep them hidden until the current user submits. Submissions have no update or delete policy, making each decision append-only and locked.
 
 Categories currently supported: economics, investing, personal finance, real estate, and crypto.
