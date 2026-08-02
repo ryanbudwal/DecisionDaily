@@ -5,6 +5,21 @@ export type Evidence = {
   tone: "positive" | "negative" | "neutral";
 };
 
+export type BasicChoice = {
+  id: number;
+  challenge_id: number;
+  prompt_type: "reasoning" | "risk" | "change_mind";
+  option_key: string;
+  option_text: string;
+  display_order: number;
+};
+
+export type BasicChoiceGroups = {
+  reasoning: BasicChoice[];
+  risk: BasicChoice[];
+  change_mind: BasicChoice[];
+};
+
 export type Challenge = {
   id: number;
   slug: string;
@@ -18,6 +33,7 @@ export type Challenge = {
   evidence: Evidence[];
   decision_options: string[];
   source_note: string | null;
+  basic_choices?: BasicChoiceGroups;
 };
 
 export type Outcome = {

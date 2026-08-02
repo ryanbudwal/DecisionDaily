@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import type { Challenge, Outcome } from "@/types/challenge";
+import type { BasicChoice, BasicChoiceGroups, Challenge, Outcome } from "@/types/challenge";
 import type { ScoreRecord } from "@/types/score";
 import type { Submission } from "@/types/submission";
 
@@ -23,7 +23,22 @@ export async function getChallenge(slug: string) {
     .eq("slug", slug)
     .maybeSingle();
   if (error) fail(error.message);
-  return (data as Challenge | null) ?? null;
+  if (!data) return null;
+
+  const challenge = data as Challenge;
+  const { data: choiceData, error: choiceError } = await supabase
+    .from("basic_choice_options")
+    .select("id, challenge_id, prompt_type, option_key, option_text, display_order")
+    .eq("challenge_id", challenge.id)
+    .order("display_order", { ascending: true });
+  if (choiceError) fail(choiceError.message);
+
+  const basicChoices: BasicChoiceGroups = { reasoning: [], risk: [], change_mind: [] };
+  for (const choice of (choiceData ?? []) as BasicChoice[]) {
+    basicChoices[choice.prompt_type].push(choice);
+  }
+
+  return { ...challenge, basic_choices: basicChoices };
 }
 
 export async function getSubmissions() {

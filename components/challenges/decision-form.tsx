@@ -1,12 +1,40 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-gate";
 import { supabase } from "@/lib/supabase";
-import type { Challenge } from "@/types/challenge";
+import type { BasicChoice, Challenge } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
+
+function ChoiceGroup({
+  title,
+  hint,
+  options,
+  selected,
+  onSelect,
+}: {
+  title: string;
+  hint: string;
+  options: BasicChoice[];
+  selected: number | null;
+  onSelect: (id: number) => void;
+}) {
+  return <fieldset className="choice-group">
+    <legend>{title}</legend>
+    <p>{hint}</p>
+    <div className="choice-grid">
+      {options.map((option) => <button
+        type="button"
+        key={option.id}
+        className={selected === option.id ? "selected" : ""}
+        aria-pressed={selected === option.id}
+        onClick={() => onSelect(option.id)}
+      >{option.option_text}</button>)}
+    </div>
+  </fieldset>;
+}
 
 export function DecisionForm({ challenge, submission }: { challenge: Challenge; submission: Submission | null }) {
   const router = useRouter();
@@ -14,17 +42,14 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
   const [decision, setDecision] = useState(challenge.decision_options[0] ?? "");
   const [allocation, setAllocation] = useState(10);
   const [confidence, setConfidence] = useState(60);
-  const [reasoning, setReasoning] = useState("");
-  const [risks, setRisks] = useState("");
-  const [changeMind, setChangeMind] = useState("");
+  const [reasoningChoice, setReasoningChoice] = useState<number | null>(null);
+  const [riskChoice, setRiskChoice] = useState<number | null>(null);
+  const [changeChoice, setChangeChoice] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const riskList = useMemo(
-    () => risks.split("\n").map((risk) => risk.trim()).filter(Boolean).slice(0, 8),
-    [risks],
-  );
-  const ready = reasoning.trim().length >= 60 && changeMind.trim().length >= 20 && riskList.length > 0;
+  const choices = challenge.basic_choices;
+  const ready = Boolean(decision && reasoningChoice && riskChoice && changeChoice);
 
   async function submitDecision() {
     if (!ready) return;
@@ -33,12 +58,13 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
     const { error: submitError } = await supabase.from("challenge_submissions").insert({
       user_id: user.id,
       challenge_id: challenge.id,
+      submission_mode: "basic",
       decision,
       allocation_percent: allocation,
       confidence_percent: confidence,
-      reasoning: reasoning.trim(),
-      risks: riskList,
-      change_my_mind: changeMind.trim(),
+      selected_reasoning_option_id: reasoningChoice,
+      selected_risk_option_id: riskChoice,
+      selected_change_option_id: changeChoice,
     });
 
     if (submitError) {
@@ -53,31 +79,35 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
     return <div className="decision-complete">
       <div className="reveal-label">Decision locked</div>
       <h2>Your answer is safely recorded.</h2>
-      <p>Review your process score, the historical outcome, and the lesson you can carry forward.</p>
+      <p>Review your score, the historical outcome, and what each choice revealed about your process.</p>
       <Link className="primary-link" href={`/challenge/${challenge.slug}/results`}>View results →</Link>
     </div>;
   }
 
+  if (!choices || choices.reasoning.length === 0) {
+    return <div className="route-error">Basic choices are not available for this challenge yet.</div>;
+  }
+
   return <>
-    <div className="column-heading"><span>02</span><div><small>Commit before the reveal</small><h2>Your decision</h2></div></div>
+    <div className="column-heading"><span>02</span><div><small>Basic mode · about 2 minutes</small><h2>Make your call</h2></div></div>
     <p className="decision-prompt">{challenge.decision_prompt}</p>
     {error && <div className="form-error" role="alert">{error}</div>}
+
     <fieldset><legend>Choose one action</legend><div className="decision-options">
-      {challenge.decision_options.map((option) => <button type="button" key={option} className={decision === option ? "selected" : ""} onClick={() => setDecision(option)}>{option}</button>)}
+      {challenge.decision_options.map((option) => <button type="button" key={option} className={decision === option ? "selected" : ""} aria-pressed={decision === option} onClick={() => setDecision(option)}>{option}</button>)}
     </div></fieldset>
+
+    <ChoiceGroup title="What matters most?" hint="Choose the reasoning best supported by the scenario." options={choices.reasoning} selected={reasoningChoice} onSelect={setReasoningChoice} />
+    <ChoiceGroup title="What is the biggest risk?" hint="Choose the downside that deserves the most attention." options={choices.risk} selected={riskChoice} onSelect={setRiskChoice} />
+    <ChoiceGroup title="What would change the decision?" hint="Choose the new information that would be most useful." options={choices.change_mind} selected={changeChoice} onSelect={setChangeChoice} />
+
     <label className="form-label"><span>Capital at risk</span><b>{allocation}%</b></label>
     <input type="range" min="0" max="100" value={allocation} onChange={(event) => setAllocation(Number(event.target.value))} />
     <div className="range-scale"><span>0%</span><span>50%</span><span>100%</span></div>
-    <label className="form-label" htmlFor="reasoning"><span>Your reasoning</span><b>{reasoning.length}/2000</b></label>
-    <textarea id="reasoning" value={reasoning} onChange={(event) => setReasoning(event.target.value)} maxLength={2000} placeholder="Which evidence matters most, and how did you weigh the trade-offs?" />
-    <label className="form-label" htmlFor="risks"><span>Key risks</span><b>One per line</b></label>
-    <textarea id="risks" className="short-textarea" value={risks} onChange={(event) => setRisks(event.target.value)} placeholder={"Customer churn\nLiquidity pressure\nExecution risk"} />
-    <label className="form-label" htmlFor="change-mind"><span>What would change your mind?</span><b>{changeMind.length}/1000</b></label>
-    <textarea id="change-mind" className="short-textarea" value={changeMind} onChange={(event) => setChangeMind(event.target.value)} maxLength={1000} placeholder="Name a specific signal or new fact that would make you reconsider." />
     <label className="form-label"><span>Confidence</span><b>{confidence}%</b></label>
     <input type="range" min="1" max="100" value={confidence} onChange={(event) => setConfidence(Number(event.target.value))} />
     <p className="calibration-note">Confidence is not certainty. Estimate honestly.</p>
     <button className="lock-decision" disabled={!ready || submitting} onClick={submitDecision}>{submitting ? "Locking…" : "Lock decision & reveal"}<span>→</span></button>
-    {!ready && <p className="form-requirement">Write at least 60 characters, identify a risk, and say what would change your mind.</p>}
+    {!ready && <p className="form-requirement">Choose one card from each group to reveal the result.</p>}
   </>;
 }

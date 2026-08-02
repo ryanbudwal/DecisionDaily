@@ -45,6 +45,12 @@ export default function ResultsPage() {
         <h2>Your process score</h2>
         <div className="score-circle" style={{ "--score-angle": `${submission.score * 3.6}deg` } as React.CSSProperties}><b>{submission.score}</b><span>/100</span></div>
         <div className="locked-choice"><span>Your decision</span><b>{submission.decision}</b><small>{submission.allocation_percent}% at risk · {submission.confidence_percent}% confidence</small></div>
+        <div className="selected-thinking">
+          <span>Your selected cards</span>
+          <p><b>Reasoning:</b> {submission.reasoning}</p>
+          <p><b>Risk:</b> {submission.risks[0]}</p>
+          <p><b>Change signal:</b> {submission.change_my_mind}</p>
+        </div>
         <ScoreBreakdown breakdown={submission.scoring_breakdown} />
       </article>
       <article className="results-outcome-card">

@@ -1,0 +1,12 @@
+create index challenge_submissions_reasoning_choice_idx
+on public.challenge_submissions (selected_reasoning_option_id)
+where selected_reasoning_option_id is not null;
+
+create index challenge_submissions_risk_choice_idx
+on public.challenge_submissions (selected_risk_option_id)
+where selected_risk_option_id is not null;
+
+create index challenge_submissions_change_choice_idx
+on public.challenge_submissions (selected_change_option_id)
+where selected_change_option_id is not null;
+

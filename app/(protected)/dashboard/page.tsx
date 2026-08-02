@@ -34,14 +34,14 @@ export default function DashboardPage() {
 
   return <section className="dashboard-page">
     <div className="dashboard-intro">
-      <span className="section-kicker">Today&apos;s shared decision</span>
-      <h1>One scenario.<br />Your reasoning.</h1>
-      <p>Study the evidence available at the time, commit your decision, and reveal the outcome only after your thinking is locked.</p>
+      <span className="section-kicker">Today&apos;s shared investment game</span>
+      <h1>One scenario.<br />Make your call.</h1>
+      <p>Read the evidence, choose the cards that matter most, lock your decision, and reveal what happened.</p>
     </div>
 
     <article className="daily-card-featured">
       <div className="daily-card-meta">
-        <span className="daily-sequence">Daily scenario</span>
+        <span className="daily-sequence">Basic · quick play</span>
         <time>{formatDate(challenge.publish_date)}</time>
       </div>
       <div className="daily-card-body">
@@ -50,15 +50,20 @@ export default function DashboardPage() {
           <h2>{challenge.title}</h2>
           <p>{challenge.subtitle}</p>
         </div>
-        <div className="daily-card-status">
+        {completed && <div className="daily-card-status">
           <span>{completed ? "Completed" : "Ready"}</span>
-          <b>{completed ? completed.score : challenge.difficulty}</b>
-          <small>{completed ? "Process score" : "Difficulty"}</small>
-        </div>
+          <b>{completed.score}</b>
+          <small>Process score</small>
+        </div>}
       </div>
       <Link className="primary-link" href={completed ? `/challenge/${challenge.slug}/results` : `/challenge/${challenge.slug}`}>
         {completed ? "Review today’s result" : "Start today’s challenge"} →
       </Link>
+    </article>
+
+    <article className="advanced-mode-card" aria-disabled="true">
+      <div><span className="daily-sequence">Advanced · deep analysis</span><h2>Write out your full investment case</h2><p>A longer mode for detailed reasoning, risks, and alternative views.</p></div>
+      <strong>Coming later</strong>
     </article>
 
     <div className="dashboard-stats">
