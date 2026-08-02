@@ -61,9 +61,11 @@ export default function DashboardPage() {
       </Link>
     </article>
 
-    <article className="advanced-mode-card" aria-disabled="true">
-      <div><span className="daily-sequence">Advanced · deep analysis</span><h2>Write out your full investment case</h2><p>A longer mode for detailed reasoning, risks, and alternative views.</p></div>
-      <strong>Coming later</strong>
+    <article className="advanced-mode-card">
+      <div><span className="daily-sequence">Advanced · deep analysis</span><h2>Write out your full investment case</h2><p>Use the original format for detailed reasoning, key risks, and what would change your mind.</p></div>
+      <Link className="advanced-mode-link" href={completed ? `/challenge/${challenge.slug}/results` : `/challenge/${challenge.slug}/advanced`}>
+        {completed ? `Review ${completed.submission_mode} result` : "Start advanced mode"} →
+      </Link>
     </article>
 
     <div className="dashboard-stats">
