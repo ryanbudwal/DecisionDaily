@@ -5,22 +5,11 @@ export type Evidence = {
   tone: "positive" | "negative" | "neutral";
 };
 
-export type Category =
-  | "economics"
-  | "investing"
-  | "personal-finance"
-  | "business"
-  | "real-estate"
-  | "crypto"
-  | "markets"
-  | "entrepreneurship";
-
 export type Challenge = {
   id: number;
   slug: string;
   challenge_number: number;
   publish_date: string;
-  category: Category;
   difficulty: "beginner" | "intermediate" | "advanced";
   title: string;
   subtitle: string;

@@ -10,7 +10,7 @@ DecisionLab is a daily financial decision-making platform inspired by Wordle. Ev
 - Locked, one-time submissions
 - Deterministic reasoning and risk-management score
 - Outcome hidden until submission
-- Permanent archive with category filters
+- Permanent chronological archive
 - Practice access to missed challenges
 - Private per-user submission history
 
@@ -27,6 +27,6 @@ The browser is allowed to receive the Supabase URL and publishable key. Security
 
 ## Database
 
-The original deployed schema is documented in [`supabase/schema.sql`](supabase/schema.sql), with forward changes recorded under [`supabase/migrations`](supabase/migrations). Challenge outcomes are stored separately from prompts so row-level security can keep them hidden until the current user submits. Submissions have no update or delete policy, making each decision append-only and locked.
+The schema scaffold is documented in [`supabase/schema.sql`](supabase/schema.sql), while the timestamped files under [`supabase/migrations`](supabase/migrations) are the source of truth for the deployed database. Challenge outcomes are stored separately from prompts so row-level security can keep them hidden until the current user submits. Submissions have no update or delete policy, making each decision append-only and locked.
 
-Categories currently supported: economics, investing, personal finance, real estate, and crypto.
+Each publish date has one shared scenario. Past scenarios remain in chronological order for practice.

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { DecisionForm } from "@/components/challenges/decision-form";
 import { getChallenge, getSubmission } from "@/lib/challenges/queries";
-import { categoryLabel, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import type { Challenge } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
 
@@ -32,7 +32,7 @@ export default function ChallengePage() {
   return <>
     <section className="daily-hero">
       <div className="daily-label"><span>Decision challenge</span><i />{formatDate(challenge.publish_date)}</div>
-      <div className="hero-main"><div><div className={`category category-${challenge.category}`}>{categoryLabel(challenge.category)}</div><h1>{challenge.title}</h1><p>{challenge.subtitle}</p></div><div className="hero-number"><span>Challenge</span><b>#{String(challenge.challenge_number).padStart(3, "0")}</b><small>{challenge.difficulty}</small></div></div>
+      <div className="hero-main"><div><h1>{challenge.title}</h1><p>{challenge.subtitle}</p></div><div className="hero-number"><span>Challenge</span><b>#{String(challenge.challenge_number).padStart(3, "0")}</b><small>{challenge.difficulty}</small></div></div>
       <div className="shared-note"><span>◎</span><p><strong>One shared scenario.</strong> Everyone sees the same evidence before making a decision.</p></div>
     </section>
 

@@ -1,4 +1,4 @@
-export type ScorePart = { score: number; max: number };
+export type ScorePart = { score: number; max: number; feedback?: string };
 
 export type ScoreRecord = {
   submission_id: number;

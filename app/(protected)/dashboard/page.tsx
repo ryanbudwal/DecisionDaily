@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getChallenges, getSubmissions } from "@/lib/challenges/queries";
-import { categoryLabel, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import type { Challenge } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
 
@@ -41,7 +41,7 @@ export default function DashboardPage() {
 
     <article className="daily-card-featured">
       <div className="daily-card-meta">
-        <span className={`category category-${challenge.category}`}>{categoryLabel(challenge.category)}</span>
+        <span className="daily-sequence">Daily scenario</span>
         <time>{formatDate(challenge.publish_date)}</time>
       </div>
       <div className="daily-card-body">

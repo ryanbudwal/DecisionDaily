@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { categoryLabel, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import type { Challenge } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
 
 export function ChallengeCard({ challenge, submission }: { challenge: Challenge; submission?: Submission }) {
   return <Link className="archive-card" href={`/challenge/${challenge.slug}`}>
     <div className="archive-card-top">
-      <span className={`category category-${challenge.category}`}>{categoryLabel(challenge.category)}</span>
+      <span className="daily-sequence">Daily scenario</span>
       <time>{formatDate(challenge.publish_date)}</time>
     </div>
     <div className="challenge-number">Challenge #{String(challenge.challenge_number).padStart(3, "0")}</div>

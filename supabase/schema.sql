@@ -5,7 +5,6 @@ create table public.daily_challenges (
   slug text not null unique,
   challenge_number bigint not null unique,
   publish_date date not null unique,
-  category text not null check (category in ('economics', 'investing', 'personal-finance', 'real-estate', 'crypto')),
   difficulty text not null default 'intermediate' check (difficulty in ('beginner', 'intermediate', 'advanced')),
   title text not null,
   subtitle text not null,
@@ -79,9 +78,12 @@ grant select on public.daily_challenges, public.challenge_outcomes to authentica
 grant select, insert on public.challenge_submissions to authenticated;
 grant usage, select on sequence public.challenge_submissions_id_seq to authenticated;
 
-create or replace function public.calculate_submission_score()
+create schema if not exists private;
+
+create or replace function private.calculate_submission_score()
 returns trigger
 language plpgsql
+security definer
 set search_path = ''
 as $$
 declare
@@ -134,6 +136,6 @@ $$;
 
 create trigger score_challenge_submission
 before insert on public.challenge_submissions
-for each row execute function public.calculate_submission_score();
+for each row execute function private.calculate_submission_score();
 
 -- Keep scoring server-side; never accept score values from the browser.
