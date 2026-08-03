@@ -34,15 +34,15 @@ export default function DashboardPage() {
 
   return <section className="dashboard-page">
     <div className="dashboard-intro">
-      <span className="section-kicker">Today&apos;s shared investment game</span>
-      <h1>One scenario.<br />Make your call.</h1>
-      <p>Read the evidence, choose the cards that matter most, lock your decision, and reveal what happened.</p>
+      <time className="dashboard-date">{formatDate(challenge.publish_date)}</time>
+      <h1>One scenario. Make your call.</h1>
+      <p>Everyone gets the same evidence. Choose how deeply you want to think today.</p>
     </div>
 
     <article className="daily-card-featured">
       <div className="daily-card-meta">
         <span className="daily-sequence">Basic · quick play</span>
-        <time>{formatDate(challenge.publish_date)}</time>
+        <span className="mode-time">About 2 minutes</span>
       </div>
       <div className="daily-card-body">
         <div>
@@ -62,7 +62,7 @@ export default function DashboardPage() {
     </article>
 
     <article className="advanced-mode-card">
-      <div><span className="daily-sequence">Advanced · deep analysis</span><h2>Write out your full investment case</h2><p>Use the original format for detailed reasoning, key risks, and what would change your mind.</p></div>
+      <div><span className="daily-sequence">Advanced · deep analysis</span><h2>Write out your full investment case</h2><p>Use detailed reasoning, key risks, and the evidence that would change your mind.</p></div>
       <Link className="advanced-mode-link" href={completed ? `/challenge/${challenge.slug}/results` : `/challenge/${challenge.slug}/advanced`}>
         {completed ? `Review ${completed.submission_mode} result` : "Start advanced mode"} →
       </Link>

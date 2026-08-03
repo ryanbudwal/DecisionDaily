@@ -9,7 +9,11 @@ export const metadata: Metadata = {
     title: "DecisionLab — One financial decision every day",
     description: "Analyze the evidence, lock your reasoning, and learn from one shared financial challenge every day.",
     type: "website",
-    images: [{ url: "/decisionlab-social.svg", width: 1200, height: 630, alt: "DecisionLab daily financial reasoning challenge" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DecisionLab — One financial decision every day",
+    description: "Review the evidence, make your call, and improve your financial decision process.",
   },
 };
 

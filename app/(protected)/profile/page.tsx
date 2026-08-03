@@ -29,6 +29,18 @@ export default function ProfilePage() {
   const averageScore = submissions.length
     ? Math.round(submissions.reduce((sum, item) => sum + item.score, 0) / submissions.length)
     : 0;
+  const recentScores = submissions.slice(0, 8).reverse();
+  const skillRows = [
+    ["reasoning", "Reasoning"],
+    ["risk_management", "Risk awareness"],
+    ["falsifiability", "Open-mindedness"],
+    ["position_sizing", "Position sizing"],
+    ["confidence_discipline", "Confidence calibration"],
+  ] as const;
+  const skillValue = (key: string) => {
+    const values = submissions.map((item) => item.scoring_breakdown[key]).filter(Boolean);
+    return values.length ? Math.round(values.reduce((sum, item) => sum + (item.score / item.max) * 100, 0) / values.length) : 0;
+  };
 
   return <section className="profile-page">
     <div className="profile-heading">
@@ -43,6 +55,10 @@ export default function ProfilePage() {
     </div>
 
     <div className="profile-baseline"><span>V1 baseline</span><p>These starter insights are private to your account. Future versions will update them from patterns in your decisions, confidence, risk analysis, and reflections.</p></div>
+    <div className="profile-analysis-grid">
+      <article className="profile-chart-card"><div className="profile-section-title"><div><span>Progress</span><h2>Score trend</h2></div><small>Last {Math.max(recentScores.length, 1)} challenges</small></div><div className="score-trend" aria-label="Recent process scores">{recentScores.length ? recentScores.map((item, index) => <div key={item.id} className="trend-column"><i style={{ height: `${Math.max(item.score, 8)}%` }} /><span>{index + 1}</span></div>) : <p>Complete a challenge to begin your score trend.</p>}</div></article>
+      <article className="profile-skills-card"><div className="profile-section-title"><div><span>Process</span><h2>Decision skills</h2></div></div><div className="skill-bars">{skillRows.map(([key, label]) => { const value = skillValue(key); return <div key={key}><span>{label}</span><i><em style={{ width: `${value}%` }} /></i><b>{value || "—"}</b></div>; })}</div></article>
+    </div>
     <div className="profile-insights">
       <article className="profile-insight profile-insight-primary"><div className="insight-icon">R</div><small>Risk tolerance</small><h2>{profile?.risk_tolerance ?? "Medium"}</h2><p>You are comfortable taking measured risk when the evidence supports it, without treating uncertainty as certainty.</p></article>
       <article className="profile-insight profile-insight-strength"><div className="insight-icon">+</div><small>Strength</small><h2>{profile?.strength ?? "Long-term thinking"}</h2><p>You tend to look beyond the immediate reaction and consider how a decision compounds over time.</p></article>
@@ -50,5 +66,6 @@ export default function ProfilePage() {
       <article className="profile-insight profile-insight-caution"><div className="insight-icon">!</div><small>Weakness</small><h2>{profile?.weakness ?? "Overconfidence during high volatility"}</h2><p>Fast-moving situations can make conviction rise more quickly than the quality of the available evidence.</p></article>
       <article className="profile-insight profile-insight-wide"><div className="insight-icon">↘</div><small>Most common mistake</small><h2>{profile?.most_common_mistake ?? "Ignoring downside scenarios"}</h2><p>Before locking a decision, deliberately write the strongest downside case and decide which signal would prove it is unfolding.</p></article>
     </div>
+    <div className="insight-note"><strong>Your insights evolve with you.</strong><p>These are patterns from your practice—not permanent labels. Stronger evidence from future challenges can change them.</p></div>
   </section>;
 }
