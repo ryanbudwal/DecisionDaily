@@ -50,9 +50,7 @@ export function AdvancedDecisionForm({ challenge, submission }: { challenge: Cha
     router.push(`/challenge/${challenge.slug}/results`);
   }
 
-  const canReplay = user.app_metadata.can_replay === true;
-
-  if (submission && !canReplay) {
+  if (submission) {
     return <div className="decision-complete">
       <div className="reveal-label">Decision already locked</div>
       <h2>You chose {submission.submission_mode === "basic" ? "Basic" : "Advanced"} mode.</h2>
@@ -63,7 +61,6 @@ export function AdvancedDecisionForm({ challenge, submission }: { challenge: Cha
 
   return <>
     <div className="column-heading"><span>02</span><div><small>Advanced mode · written analysis</small><h2>Build your case</h2></div></div>
-    {submission && <p className="calibration-note">CEO replay · this practice attempt will not replace your original score or affect your profile.</p>}
     <p className="decision-prompt">{challenge.decision_prompt}</p>
     {error && <div className="form-error" role="alert">{error}</div>}
     <fieldset><legend>Choose one action</legend><div className="decision-options">

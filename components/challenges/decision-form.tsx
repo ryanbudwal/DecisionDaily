@@ -8,9 +8,6 @@ import { supabase } from "@/lib/supabase";
 import type { BasicChoice, Challenge } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
 
-// The V1 database still requires this field, but Basic mode no longer asks for or displays it.
-const BASIC_MODE_CONFIDENCE_PERCENT = 60;
-
 function ChoiceGroup({
   title,
   hint,
@@ -44,6 +41,7 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
   const { user } = useAuth();
   const [decision, setDecision] = useState(challenge.decision_options[0] ?? "");
   const [allocation, setAllocation] = useState(10);
+  const [confidence, setConfidence] = useState(60);
   const [reasoningChoice, setReasoningChoice] = useState<number | null>(null);
   const [riskChoice, setRiskChoice] = useState<number | null>(null);
   const [changeChoice, setChangeChoice] = useState<number | null>(null);
@@ -63,7 +61,7 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
       submission_mode: "basic",
       decision,
       allocation_percent: allocation,
-      confidence_percent: BASIC_MODE_CONFIDENCE_PERCENT,
+      confidence_percent: confidence,
       selected_reasoning_option_id: reasoningChoice,
       selected_risk_option_id: riskChoice,
       selected_change_option_id: changeChoice,
@@ -77,9 +75,7 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
     router.push(`/challenge/${challenge.slug}/results`);
   }
 
-  const canReplay = user.app_metadata.can_replay === true;
-
-  if (submission && !canReplay) {
+  if (submission) {
     return <div className="decision-complete">
       <div className="reveal-label">Decision locked</div>
       <h2>Your answer is safely recorded.</h2>
@@ -94,7 +90,6 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
 
   return <>
     <div className="column-heading"><span>02</span><div><small>Basic mode · about 2 minutes</small><h2>Make your call</h2></div></div>
-    {submission && <p className="calibration-note">CEO replay · this practice attempt will not replace your original score or affect your profile.</p>}
     <p className="decision-prompt">{challenge.decision_prompt}</p>
     {error && <div className="form-error" role="alert">{error}</div>}
 
@@ -109,6 +104,9 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
     <label className="form-label"><span>Capital at risk</span><b>{allocation}%</b></label>
     <input type="range" min="0" max="100" value={allocation} onChange={(event) => setAllocation(Number(event.target.value))} />
     <div className="range-scale"><span>0%</span><span>50%</span><span>100%</span></div>
+    <label className="form-label"><span>Confidence</span><b>{confidence}%</b></label>
+    <input type="range" min="1" max="100" value={confidence} onChange={(event) => setConfidence(Number(event.target.value))} />
+    <p className="calibration-note">Confidence is not certainty. Estimate honestly.</p>
     <button className="lock-decision" disabled={!ready || submitting} onClick={submitDecision}>{submitting ? "Locking…" : "Lock decision & reveal"}<span>→</span></button>
     {!ready && <p className="form-requirement">Choose one card from each group to reveal the result.</p>}
   </>;
