@@ -25,7 +25,7 @@ export default function AdvancedChallengePage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  if (loading) return <div className="route-loading"><span>DL</span><p>Preparing advanced mode…</p></div>;
+  if (loading) return <div className="route-loading"><span>DD</span><p>Preparing advanced mode…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
   if (!challenge) return <div className="route-error">This challenge could not be found.</div>;
 
