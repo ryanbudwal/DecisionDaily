@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/auth/auth-gate";
 import { StreakDisplay } from "@/components/profile/streak-display";
 import { getSubmissions } from "@/lib/challenges/queries";
 import { getProfile } from "@/lib/profile/queries";
@@ -8,6 +9,7 @@ import type { Profile } from "@/types/profile";
 import type { Submission } from "@/types/submission";
 
 export default function ProfilePage() {
+  const { isGuest } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [error, setError] = useState("");
@@ -47,7 +49,7 @@ export default function ProfilePage() {
   return <section className="profile-page">
     <div className="profile-heading">
       <div><span className="section-kicker">Your private learning record</span><h1>Your decision profile</h1><p>A living snapshot of how you approach uncertainty. It will become more personal as Decision Daily learns from your locked decisions.</p></div>
-      <div className="profile-identity"><span>{(profile?.username ?? "D").charAt(0).toUpperCase()}</span><div><small>Decision Daily member</small><b>{profile?.username ?? "Your profile"}</b></div></div>
+      <div className="profile-identity"><span>{isGuest ? "G" : (profile?.username ?? "D").charAt(0).toUpperCase()}</span><div><small>{isGuest ? "Guest player" : "Decision Daily member"}</small><b>{isGuest ? "Temporary profile" : profile?.username ?? "Your profile"}</b></div></div>
     </div>
 
     <div className="profile-metrics">

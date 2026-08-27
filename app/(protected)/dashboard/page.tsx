@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/components/auth/auth-gate";
 import { getChallenges, getSubmissions } from "@/lib/challenges/queries";
 import { formatDate } from "@/lib/utils";
 import type { Challenge } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
 
 export default function DashboardPage() {
+  const { isGuest } = useAuth();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [error, setError] = useState("");
@@ -33,6 +35,7 @@ export default function DashboardPage() {
     : 0;
 
   return <section className="dashboard-page">
+    {isGuest && <aside className="guest-session-note"><span>Guest mode</span><p>Your decisions are private and saved in this browser, but they will not follow you to another device.</p></aside>}
     <div className="dashboard-intro">
       <time className="dashboard-date">{formatDate(challenge.publish_date)}</time>
       <h1>One scenario. Make your call.</h1>

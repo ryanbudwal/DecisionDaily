@@ -13,7 +13,12 @@ const links = [
 
 export function AppHeader() {
   const pathname = usePathname();
-  const { user, profileName, signOut } = useAuth();
+  const { user, profileName, isGuest, signOut } = useAuth();
+
+  async function handleSignOut() {
+    if (isGuest && !window.confirm("Exit guest mode? Your guest progress cannot be recovered after you sign out.")) return;
+    await signOut();
+  }
 
   return <header className="app-header">
     <Link className="brand" href="/dashboard" aria-label="Decision Daily home"><span>DD</span> Decision Daily</Link>
@@ -27,8 +32,8 @@ export function AppHeader() {
         </Link>;
       })}
     </nav>
-    <button className="auth-signout" onClick={() => void signOut()} title={profileName || user.email || "Signed in"}>
-      <span>{(profileName?.[0] ?? user.email?.[0] ?? "D").toUpperCase()}</span><b>Sign out</b>
+    <button className="auth-signout" onClick={() => void handleSignOut()} title={isGuest ? "Exit guest mode" : profileName || user.email || "Signed in"}>
+      <span>{isGuest ? "G" : (profileName?.[0] ?? user.email?.[0] ?? "D").toUpperCase()}</span><b>{isGuest ? "Exit guest" : "Sign out"}</b>
     </button>
   </header>;
 }

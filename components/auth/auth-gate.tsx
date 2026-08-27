@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 type AuthContextValue = {
   user: User;
   profileName: string;
+  isGuest: boolean;
   signOut: () => Promise<void>;
 };
 
@@ -63,6 +64,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const value = useMemo<AuthContextValue | null>(() => user ? {
     user,
     profileName,
+    isGuest: user.is_anonymous === true,
     signOut: async () => {
       await supabase.auth.signOut();
       router.replace("/");
