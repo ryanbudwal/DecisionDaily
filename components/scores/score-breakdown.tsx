@@ -8,16 +8,9 @@ const scoreParts = [
   ["confidence_discipline", "Confidence discipline"],
 ] as const;
 
-export function ScoreBreakdown({
-  breakdown,
-  hideConfidence = false,
-}: {
-  breakdown: Record<string, ScorePart>;
-  hideConfidence?: boolean;
-}) {
+export function ScoreBreakdown({ breakdown }: { breakdown: Record<string, ScorePart> }) {
   return <div className="breakdown-list">
     {scoreParts.map(([key, label]) => {
-      if (hideConfidence && key === "confidence_discipline") return null;
       const value = breakdown[key];
       if (!value) return null;
       return <div key={key}>
