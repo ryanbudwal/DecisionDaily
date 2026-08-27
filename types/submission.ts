@@ -17,4 +17,7 @@ export type Submission = {
   score: number;
   scoring_breakdown: Record<string, ScorePart>;
   submitted_at: string;
+  attempt_number: number;
+  is_replay: boolean;
+
 };

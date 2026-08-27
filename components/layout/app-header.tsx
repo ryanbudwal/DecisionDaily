@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-gate";
 
 const links = [
-  { href: "/dashboard", label: "Today" },
-  { href: "/archive", label: "Archive" },
-  { href: "/profile", label: "Profile" },
-  { href: "/scoring", label: "How scoring works" },
+  { href: "/dashboard", label: "Today", shortLabel: "Today", icon: "01" },
+  { href: "/archive", label: "Archive", shortLabel: "Archive", icon: "02" },
+  { href: "/profile", label: "Profile", shortLabel: "Profile", icon: "03" },
+  { href: "/scoring", label: "How scoring works", shortLabel: "Scoring", icon: "04" },
 ];
 
 export function AppHeader() {
@@ -16,16 +16,19 @@ export function AppHeader() {
   const { user, profileName, signOut } = useAuth();
 
   return <header className="app-header">
-    <Link className="brand" href="/dashboard"><span>DL</span> DecisionLab</Link>
+    <Link className="brand" href="/dashboard" aria-label="Decision Daily home"><span>DD</span> Decision Daily</Link>
     <nav aria-label="Primary navigation">
-      {links.map((link) => <Link
-        key={link.href}
-        href={link.href}
-        className={pathname === link.href || (link.href === "/dashboard" && pathname.startsWith("/challenge/")) ? "active" : ""}
-      >{link.label}</Link>)}
+      {links.map((link) => {
+        const active = pathname === link.href || (link.href === "/dashboard" && pathname.startsWith("/challenge/"));
+        return <Link key={link.href} href={link.href} className={active ? "active" : ""} aria-current={active ? "page" : undefined}>
+          <span className="nav-index" aria-hidden="true">{link.icon}</span>
+          <span className="nav-label">{link.label}</span>
+          <span className="nav-short-label">{link.shortLabel}</span>
+        </Link>;
+      })}
     </nav>
     <button className="auth-signout" onClick={() => void signOut()} title={profileName || user.email || "Signed in"}>
-      <span>{(profileName?.[0] ?? user.email?.[0] ?? "D").toUpperCase()}</span> Sign out
+      <span>{(profileName?.[0] ?? user.email?.[0] ?? "D").toUpperCase()}</span><b>Sign out</b>
     </button>
   </header>;
 }

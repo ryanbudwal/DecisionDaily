@@ -23,7 +23,7 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="route-loading"><span>DL</span><p>Loading today&apos;s challenge…</p></div>;
+  if (loading) return <div className="route-loading"><span>DD</span><p>Loading today&apos;s challenge…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
   if (!challenge) return <div className="route-error">No challenge has been published yet.</div>;
 
