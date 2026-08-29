@@ -22,6 +22,7 @@ export type BasicChoiceGroups = {
 
 export type Challenge = {
   id: number;
+  challenge_mode: "basic" | "advanced" | "both";
   slug: string;
   challenge_number: number;
   publish_date: string;

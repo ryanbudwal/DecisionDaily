@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { DecisionForm } from "@/components/challenges/decision-form";
-import { getChallenge, getSubmission } from "@/lib/challenges/queries";
+import { getChallenge, getCurrentReleaseDate, getSubmission } from "@/lib/challenges/queries";
 import { formatDate } from "@/lib/utils";
 import type { Challenge } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
@@ -12,13 +12,15 @@ export default function ChallengePage() {
   const { slug } = useParams<{ slug: string }>();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [submission, setSubmission] = useState<Submission | null>(null);
+  const [releaseDate, setReleaseDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    void getChallenge(slug)
-      .then(async (nextChallenge) => {
+    void Promise.all([getChallenge(slug), getCurrentReleaseDate()])
+      .then(async ([nextChallenge, nextReleaseDate]) => {
         setChallenge(nextChallenge);
+        setReleaseDate(nextReleaseDate);
         if (nextChallenge) setSubmission(await getSubmission(nextChallenge.id));
       })
       .catch((reason: Error) => setError(reason.message))
@@ -28,6 +30,7 @@ export default function ChallengePage() {
   if (loading) return <div className="route-loading"><span>DD</span><p>Preparing the evidence…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
   if (!challenge) return <div className="route-error">This challenge could not be found.</div>;
+  if (challenge.challenge_mode === "advanced") return <div className="route-error">This is an Advanced Weekly challenge. Open it from the Advanced section.</div>;
 
   return <>
     <section className="daily-hero">
@@ -46,7 +49,7 @@ export default function ChallengePage() {
         </div>
         <div className="source-lock"><span>⊘</span><p>{challenge.source_note}<small>No hindsight is included before submission.</small></p></div>
       </article>
-      <aside className="decision-column"><DecisionForm challenge={challenge} submission={submission} /></aside>
+      <aside className="decision-column"><DecisionForm challenge={challenge} submission={submission} isArchivePractice={challenge.publish_date < releaseDate} /></aside>
     </section>
   </>;
 }

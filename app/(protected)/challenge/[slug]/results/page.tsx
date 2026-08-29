@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-gate";
 import { ScoreBreakdown } from "@/components/scores/score-breakdown";
-import { getChallenge, getOutcome, getSubmission } from "@/lib/challenges/queries";
+import { getChallenge, getCurrentReleaseDate, getOutcome, getSubmission } from "@/lib/challenges/queries";
 import type { Challenge, Outcome } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
 
@@ -16,15 +16,17 @@ export default function ResultsPage() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [releaseDate, setReleaseDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const canReplay = user.app_metadata.can_replay === true;
 
   useEffect(() => {
-    void getChallenge(slug)
-      .then(async (nextChallenge) => {
+    void Promise.all([getChallenge(slug), getCurrentReleaseDate()])
+      .then(async ([nextChallenge, nextReleaseDate]) => {
         if (!nextChallenge) return;
         setChallenge(nextChallenge);
+        setReleaseDate(nextReleaseDate);
         const nextSubmission = await getSubmission(nextChallenge.id);
         if (!nextSubmission) {
           router.replace(`/challenge/${slug}`);
@@ -62,7 +64,7 @@ export default function ResultsPage() {
           <div className="learning-list"><span>Lessons to carry forward</span>{outcome.learning_points.map((point) => <p key={point}>✓ {point}</p>)}</div>
         </> : <div className="outcome-loading">The outcome is unavailable. Your decision remains safely locked.</div>}
         <div className="results-actions">
-          {canReplay && <Link href={submission.submission_mode === "advanced" ? `/challenge/${challenge.slug}/advanced` : `/challenge/${challenge.slug}`}>Replay this challenge ↻</Link>}
+          {(canReplay || challenge.publish_date < releaseDate) && <Link href={submission.submission_mode === "advanced" ? `/challenge/${challenge.slug}/advanced` : `/challenge/${challenge.slug}`}>{challenge.publish_date < releaseDate ? "Practise again" : "Replay this challenge"} ↻</Link>}
           <Link href="/archive">Explore the archive →</Link><Link href="/profile">View your profile →</Link>
         </div>
       </article>
