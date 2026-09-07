@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useAuth } from "@/components/auth/auth-gate";
 import { ScoreBreakdown } from "@/components/scores/score-breakdown";
 import { getChallenge, getCurrentReleaseDate, getOutcome, getSubmission } from "@/lib/challenges/queries";
 import type { Challenge, Outcome } from "@/types/challenge";
@@ -12,14 +11,12 @@ import type { Submission } from "@/types/submission";
 export default function ResultsPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
-  const { user } = useAuth();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [releaseDate, setReleaseDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const canReplay = user.app_metadata.can_replay === true;
 
   useEffect(() => {
     void Promise.all([getChallenge(slug), getCurrentReleaseDate()])
@@ -39,7 +36,7 @@ export default function ResultsPage() {
       .finally(() => setLoading(false));
   }, [router, slug]);
 
-  if (loading) return <div className="route-loading"><span>DD</span><p>Calculating your result…</p></div>;
+  if (loading) return <div className="route-loading"><span>DL</span><p>Calculating your result…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
   if (!challenge || !submission) return <div className="route-loading"><p>Returning to the challenge…</p></div>;
 
@@ -49,24 +46,21 @@ export default function ResultsPage() {
       <article className="results-score-card">
         <h2>Your process score</h2>
         <div className="score-circle" style={{ "--score-angle": `${submission.score * 3.6}deg` } as React.CSSProperties}><b>{submission.score}</b><span>/100</span></div>
-        <div className="locked-choice"><span>Your decision</span><b>{submission.decision}</b><small>{submission.allocation_percent}% at risk{submission.submission_mode === "advanced" ? ` · ${submission.confidence_percent}% confidence` : ""}</small></div>
+        <div className="locked-choice"><span>Your decision</span><b>{submission.decision}</b><small>{submission.allocation_percent}% at risk · {submission.confidence_percent}% confidence</small></div>
         <div className="selected-thinking">
           <span>{submission.submission_mode === "basic" ? "Your selected cards" : "Your written analysis"}</span>
           <p><b>Reasoning:</b> {submission.reasoning}</p>
           <p><b>{submission.risks.length > 1 ? "Risks" : "Risk"}:</b> {submission.risks.join(" · ")}</p>
           <p><b>Change signal:</b> {submission.change_my_mind}</p>
         </div>
-        <ScoreBreakdown breakdown={submission.scoring_breakdown} hideConfidence={submission.submission_mode === "basic"} />
+        <ScoreBreakdown breakdown={submission.scoring_breakdown} />
       </article>
       <article className="results-outcome-card">
         {outcome ? <>
           <div className="outcome-card"><span>What happened</span><h3>{outcome.outcome_title}</h3><b>{outcome.result_label}</b><p>{outcome.outcome_summary}</p>{outcome.benchmark_label && <small>{outcome.benchmark_label}: <strong>{outcome.benchmark_result}</strong></small>}</div>
           <div className="learning-list"><span>Lessons to carry forward</span>{outcome.learning_points.map((point) => <p key={point}>✓ {point}</p>)}</div>
         </> : <div className="outcome-loading">The outcome is unavailable. Your decision remains safely locked.</div>}
-        <div className="results-actions">
-          {(canReplay || challenge.publish_date < releaseDate) && <Link href={submission.submission_mode === "advanced" ? `/challenge/${challenge.slug}/advanced` : `/challenge/${challenge.slug}`}>{challenge.publish_date < releaseDate ? "Practise again" : "Replay this challenge"} ↻</Link>}
-          <Link href="/archive">Explore the archive →</Link><Link href="/profile">View your profile →</Link>
-        </div>
+        <div className="results-actions"><Link href="/archive">Explore the archive →</Link><Link href="/profile">View your profile →</Link></div>
       </article>
     </div>
   </section>;

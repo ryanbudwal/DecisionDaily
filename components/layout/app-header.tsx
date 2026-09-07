@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-gate";
 
 const links = [
-  { href: "/dashboard", label: "Today", shortLabel: "Today", icon: "01" },
-  { href: "/archive", label: "Archive", shortLabel: "Archive", icon: "02" },
-  { href: "/profile", label: "Profile", shortLabel: "Profile", icon: "03" },
-  { href: "/scoring", label: "How scoring works", shortLabel: "Scoring", icon: "04" },
+  { href: "/dashboard", label: "Today" },
+  { href: "/archive", label: "Archive" },
+  { href: "/profile", label: "Profile" },
+  { href: "/scoring", label: "How scoring works" },
 ];
 
 export function AppHeader() {
@@ -24,19 +24,16 @@ export function AppHeader() {
   }
 
   return <header className="app-header">
-    <Link className="brand" href="/dashboard" aria-label="Decision Daily home"><span>DD</span> Decision Daily</Link>
-    <nav className={canManageChallenges ? "owner-nav" : ""} aria-label="Primary navigation">
-      {visibleLinks.map((link) => {
-        const active = pathname === link.href || (link.href === "/dashboard" && pathname.startsWith("/challenge/"));
-        return <Link key={link.href} href={link.href} className={active ? "active" : ""} aria-current={active ? "page" : undefined}>
-          <span className="nav-index" aria-hidden="true">{link.icon}</span>
-          <span className="nav-label">{link.label}</span>
-          <span className="nav-short-label">{link.shortLabel}</span>
-        </Link>;
-      })}
+    <Link className="brand" href="/dashboard"><span>DL</span> DecisionLab</Link>
+    <nav aria-label="Primary navigation">
+      {links.map((link) => <Link
+        key={link.href}
+        href={link.href}
+        className={pathname === link.href || (link.href === "/dashboard" && pathname.startsWith("/challenge/")) ? "active" : ""}
+      >{link.label}</Link>)}
     </nav>
-    <button className="auth-signout" onClick={() => void handleSignOut()} title={isGuest ? "Exit guest mode" : profileName || user.email || "Signed in"}>
-      <span>{isGuest ? "G" : (profileName?.[0] ?? user.email?.[0] ?? "D").toUpperCase()}</span><b>{isGuest ? "Exit guest" : "Sign out"}</b>
+    <button className="auth-signout" onClick={() => void signOut()} title={profileName || user.email || "Signed in"}>
+      <span>{(profileName?.[0] ?? user.email?.[0] ?? "D").toUpperCase()}</span> Sign out
     </button>
   </header>;
 }

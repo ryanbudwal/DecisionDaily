@@ -1,4 +1,4 @@
-# DecisionLab
+# DecisionDaily
 
 DecisionLab is a daily financial decision-making platform inspired by Wordle. Every signed-in user receives the same challenge each day, submits a decision and written reasoning before seeing the outcome, and is scored on decision quality rather than profit alone.
 

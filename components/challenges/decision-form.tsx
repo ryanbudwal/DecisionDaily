@@ -7,7 +7,7 @@ import { useAuth } from "@/components/auth/auth-gate";
 import { ScoreBreakdown } from "@/components/scores/score-breakdown";
 import { submitBasicDecision } from "@/lib/challenges/queries";
 import type { BasicChoice, Challenge } from "@/types/challenge";
-import type { BasicPracticeResult, Submission } from "@/types/submission";
+import type { Submission } from "@/types/submission";
 
 function ChoiceGroup({
   title,
@@ -50,6 +50,7 @@ export function DecisionForm({
   const { user } = useAuth();
   const [decision, setDecision] = useState(challenge.decision_options[0] ?? "");
   const [allocation, setAllocation] = useState(10);
+  const [confidence, setConfidence] = useState(60);
   const [reasoningChoice, setReasoningChoice] = useState<number | null>(null);
   const [riskChoice, setRiskChoice] = useState<number | null>(null);
   const [changeChoice, setChangeChoice] = useState<number | null>(null);
@@ -68,40 +69,20 @@ export function DecisionForm({
       const result = await submitBasicDecision({
         challengeId: challenge.id,
       decision,
-        allocationPercent: allocation,
-        reasoningOptionId: reasoningChoice!,
-        riskOptionId: riskChoice!,
-        changeOptionId: changeChoice!,
-      });
-      if (result.status === "practice") {
-        setPracticeResult(result);
-        setSubmitting(false);
-        return;
-      }
-      router.push(`/challenge/${challenge.slug}/results`);
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "The decision could not be scored.");
+      allocation_percent: allocation,
+      confidence_percent: confidence,
+      selected_reasoning_option_id: reasoningChoice,
+      selected_risk_option_id: riskChoice,
+      selected_change_option_id: changeChoice,
+    });
+
+    if (submitError) {
+      setError(submitError.code === "23505" ? "This decision is already locked." : submitError.message);
       setSubmitting(false);
     }
   }
 
-  const canReplay = user.app_metadata.can_replay === true;
-
-  if (practiceResult) {
-    return <div className="practice-result" aria-live="polite">
-      <span className="reveal-label">Archive practice</span>
-      <h2>Your process score</h2>
-      <div className="score-circle" style={{ "--score-angle": `${practiceResult.score * 3.6}deg` } as React.CSSProperties}><b>{practiceResult.score}</b><span>/100</span></div>
-      <div className="locked-choice"><span>Your decision</span><b>{practiceResult.decision}</b><small>{practiceResult.allocation_percent}% at risk · not saved</small></div>
-      <div className="selected-thinking"><span>Your selected cards</span><p><b>Reasoning:</b> {practiceResult.reasoning}</p><p><b>Risk:</b> {practiceResult.risks.join(" · ")}</p><p><b>Change signal:</b> {practiceResult.change_my_mind}</p></div>
-      <ScoreBreakdown breakdown={practiceResult.scoring_breakdown} hideConfidence />
-      {practiceResult.outcome && <><div className="outcome-card"><span>What happened</span><h3>{practiceResult.outcome.outcome_title}</h3><b>{practiceResult.outcome.result_label}</b><p>{practiceResult.outcome.outcome_summary}</p>{practiceResult.outcome.benchmark_label && <small>{practiceResult.outcome.benchmark_label}: <strong>{practiceResult.outcome.benchmark_result}</strong></small>}</div><div className="learning-list"><span>Lessons to carry forward</span>{practiceResult.outcome.learning_points.map((point) => <p key={point}>✓ {point}</p>)}</div></>}
-      <button className="archive-link" type="button" onClick={() => setPracticeResult(null)}>Practise again ↻</button>
-      <Link className="practice-return" href="/archive">Return to archive →</Link>
-    </div>;
-  }
-
-  if (submission && !canReplay && !isArchivePractice) {
+  if (submission) {
     return <div className="decision-complete">
       <div className="reveal-label">Decision locked</div>
       <h2>Your answer is safely recorded.</h2>
@@ -116,9 +97,6 @@ export function DecisionForm({
 
   return <>
     <div className="column-heading"><span>02</span><div><small>Basic mode · about 2 minutes</small><h2>Make your call</h2></div></div>
-    {isArchivePractice
-      ? <p className="archive-practice-note"><strong>Archive practice</strong> · Your score and answers will be revealed once, but nothing will be saved or added to your profile.</p>
-      : submission && <p className="calibration-note">CEO replay · this replay will not replace your official result or affect your profile.</p>}
     <p className="decision-prompt">{challenge.decision_prompt}</p>
     {error && <div className="form-error" role="alert">{error}</div>}
 
@@ -133,7 +111,10 @@ export function DecisionForm({
     <label className="form-label"><span>Capital at risk</span><b>{allocation}%</b></label>
     <input type="range" min="0" max="100" value={allocation} onChange={(event) => setAllocation(Number(event.target.value))} />
     <div className="range-scale"><span>0%</span><span>50%</span><span>100%</span></div>
-    <button className="lock-decision" disabled={!ready || submitting} onClick={submitDecision}>{submitting ? "Scoring…" : isArchivePractice ? "Score practice & reveal" : "Lock decision & reveal"}<span>→</span></button>
+    <label className="form-label"><span>Confidence</span><b>{confidence}%</b></label>
+    <input type="range" min="1" max="100" value={confidence} onChange={(event) => setConfidence(Number(event.target.value))} />
+    <p className="calibration-note">Confidence is not certainty. Estimate honestly.</p>
+    <button className="lock-decision" disabled={!ready || submitting} onClick={submitDecision}>{submitting ? "Locking…" : "Lock decision & reveal"}<span>→</span></button>
     {!ready && <p className="form-requirement">Choose one card from each group to reveal the result.</p>}
   </>;
 }

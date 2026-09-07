@@ -49,12 +49,11 @@ export async function getChallenge(slug: string) {
 }
 
 export async function getSubmissions() {
-  const submissionResult = await supabase
-    .from("challenge_submissions")
-    .select("*")
-    .eq("is_official", true)
-    .eq("is_replay", false)
-    .order("submitted_at", { ascending: false });
+  const [submissionResult, scoreResult] = await Promise.all([
+    supabase.from("challenge_submissions").select("*").order("submitted_at", { ascending: false }),
+    supabase.from("scores").select("submission_id, overall_score, scoring_breakdown"),
+  ]);
+
   if (submissionResult.error) fail(submissionResult.error.message);
   const submissions = (submissionResult.data ?? []) as Submission[];
   if (submissions.length === 0) return [];
@@ -120,8 +119,6 @@ export async function getSubmission(challengeId: number) {
     .from("challenge_submissions")
     .select("*")
     .eq("challenge_id", challengeId)
-    .order("attempt_number", { ascending: false })
-    .limit(1)
     .maybeSingle();
   if (error) fail(error.message);
   if (!data) return null;

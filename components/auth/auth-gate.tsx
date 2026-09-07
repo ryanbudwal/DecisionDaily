@@ -76,7 +76,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   } : null, [canManageChallenges, profileName, router, user]);
 
   if (!ready || !value) {
-    return <div className="auth-loading"><span>DD</span><p>Preparing your Decision Daily workspace…</p></div>;
+    return <div className="auth-loading"><span>DL</span><p>Preparing your DecisionLab workspace…</p></div>;
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

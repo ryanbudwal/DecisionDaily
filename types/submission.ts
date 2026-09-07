@@ -18,27 +18,4 @@ export type Submission = {
   score: number;
   scoring_breakdown: Record<string, ScorePart>;
   submitted_at: string;
-  attempt_number: number;
-  is_replay: boolean;
-  is_official: boolean;
-};
-
-export type BasicPracticeResult = {
-  status: "practice";
-  is_official: false;
-  decision: string;
-  allocation_percent: number;
-  reasoning: string;
-  risks: string[];
-  change_my_mind: string;
-  score: number;
-  scoring_breakdown: Record<string, ScorePart>;
-  rubric_version: 4;
-  outcome: Outcome | null;
-};
-
-export type BasicDecisionResponse = BasicPracticeResult | {
-  status: "official" | "replay";
-  is_official: boolean;
-  submission_id: number;
 };
