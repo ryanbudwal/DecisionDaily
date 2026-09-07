@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/auth-gate";
-import { supabase } from "@/lib/supabase";
+import { ScoreBreakdown } from "@/components/scores/score-breakdown";
+import { submitBasicDecision } from "@/lib/challenges/queries";
 import type { BasicChoice, Challenge } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
 
@@ -36,7 +37,15 @@ function ChoiceGroup({
   </fieldset>;
 }
 
-export function DecisionForm({ challenge, submission }: { challenge: Challenge; submission: Submission | null }) {
+export function DecisionForm({
+  challenge,
+  submission,
+  isArchivePractice,
+}: {
+  challenge: Challenge;
+  submission: Submission | null;
+  isArchivePractice: boolean;
+}) {
   const router = useRouter();
   const { user } = useAuth();
   const [decision, setDecision] = useState(challenge.decision_options[0] ?? "");
@@ -47,6 +56,7 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
   const [changeChoice, setChangeChoice] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [practiceResult, setPracticeResult] = useState<BasicPracticeResult | null>(null);
 
   const choices = challenge.basic_choices;
   const ready = Boolean(decision && reasoningChoice && riskChoice && changeChoice);
@@ -55,10 +65,9 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
     if (!ready) return;
     setSubmitting(true);
     setError("");
-    const { error: submitError } = await supabase.from("challenge_submissions").insert({
-      user_id: user.id,
-      challenge_id: challenge.id,
-      submission_mode: "basic",
+    try {
+      const result = await submitBasicDecision({
+        challengeId: challenge.id,
       decision,
       allocation_percent: allocation,
       confidence_percent: confidence,
@@ -70,9 +79,7 @@ export function DecisionForm({ challenge, submission }: { challenge: Challenge; 
     if (submitError) {
       setError(submitError.code === "23505" ? "This decision is already locked." : submitError.message);
       setSubmitting(false);
-      return;
     }
-    router.push(`/challenge/${challenge.slug}/results`);
   }
 
   if (submission) {

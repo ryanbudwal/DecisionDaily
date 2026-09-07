@@ -28,6 +28,7 @@ export default function AdvancedChallengePage() {
   if (loading) return <div className="route-loading"><span>DL</span><p>Preparing advanced mode…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
   if (!challenge) return <div className="route-error">This challenge could not be found.</div>;
+  if (challenge.challenge_mode === "basic") return <div className="route-error">This challenge is available only in Basic mode.</div>;
 
   return <>
     <section className="daily-hero advanced-hero">

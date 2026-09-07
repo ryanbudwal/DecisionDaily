@@ -13,7 +13,15 @@ const links = [
 
 export function AppHeader() {
   const pathname = usePathname();
-  const { user, profileName, signOut } = useAuth();
+  const { user, profileName, isGuest, canManageChallenges, signOut } = useAuth();
+  const visibleLinks = canManageChallenges
+    ? [...links, { href: "/studio", label: "Challenge studio", shortLabel: "Studio", icon: "05" }]
+    : links;
+
+  async function handleSignOut() {
+    if (isGuest && !window.confirm("Exit guest mode? Your guest progress cannot be recovered after you sign out.")) return;
+    await signOut();
+  }
 
   return <header className="app-header">
     <Link className="brand" href="/dashboard"><span>DL</span> DecisionLab</Link>

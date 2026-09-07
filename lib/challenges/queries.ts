@@ -1,7 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import type { BasicChoice, BasicChoiceGroups, Challenge, Outcome } from "@/types/challenge";
 import type { ScoreRecord } from "@/types/score";
-import type { Submission } from "@/types/submission";
+import type { BasicDecisionResponse, Submission } from "@/types/submission";
+import type { ChallengeDraft } from "@/types/challenge-studio";
 
 function fail(message: string): never {
   throw new Error(message);
@@ -14,6 +15,12 @@ export async function getChallenges() {
     .order("publish_date", { ascending: false });
   if (error) fail(error.message);
   return (data ?? []) as Challenge[];
+}
+
+export async function getCurrentReleaseDate() {
+  const { data, error } = await supabase.rpc("current_release_date");
+  if (error) fail(error.message);
+  return data as string;
 }
 
 export async function getChallenge(slug: string) {
@@ -48,18 +55,63 @@ export async function getSubmissions() {
   ]);
 
   if (submissionResult.error) fail(submissionResult.error.message);
+  const submissions = (submissionResult.data ?? []) as Submission[];
+  if (submissions.length === 0) return [];
+
+  const scoreResult = await supabase
+    .from("scores")
+    .select("submission_id, overall_score, scoring_breakdown")
+    .in("submission_id", submissions.map((submission) => submission.id));
   if (scoreResult.error) fail(scoreResult.error.message);
 
   const scoreBySubmission = new Map(
     ((scoreResult.data ?? []) as ScoreRecord[]).map((score) => [score.submission_id, score]),
   );
 
-  return ((submissionResult.data ?? []) as Submission[]).map((submission) => {
+  return submissions.map((submission) => {
     const score = scoreBySubmission.get(submission.id);
     return score
       ? { ...submission, score: score.overall_score, scoring_breakdown: score.scoring_breakdown }
       : submission;
   });
+}
+
+export async function submitBasicDecision(input: {
+  challengeId: number;
+  decision: string;
+  allocationPercent: number;
+  reasoningOptionId: number;
+  riskOptionId: number;
+  changeOptionId: number;
+}) {
+  const { data, error } = await supabase.rpc("submit_basic_decision", {
+    challenge_id: input.challengeId,
+    decision: input.decision,
+    allocation_percent: input.allocationPercent,
+    reasoning_option_id: input.reasoningOptionId,
+    risk_option_id: input.riskOptionId,
+    change_option_id: input.changeOptionId,
+  });
+  if (error) fail(error.message);
+  return data as BasicDecisionResponse;
+}
+
+export async function getChallengeStudio() {
+  const { data, error } = await supabase.rpc("list_challenge_studio");
+  if (error) fail(error.message);
+  return (data ?? []) as ChallengeDraft[];
+}
+
+export async function saveChallengeDraft(draft: ChallengeDraft) {
+  const { data, error } = await supabase.rpc("save_challenge_draft", { payload: draft });
+  if (error) fail(error.message);
+  return data as number;
+}
+
+export async function publishChallenge(challengeId: number) {
+  const { data, error } = await supabase.rpc("publish_challenge", { challenge_id: challengeId });
+  if (error) fail(error.message);
+  return data as { status: "published"; publish_date: string };
 }
 
 export async function getSubmission(challengeId: number) {

@@ -52,6 +52,20 @@ export function LoginForm() {
     }
   }
 
+  async function playAsGuest() {
+    setBusy(true);
+    setMessage("");
+    const { data, error } = await supabase.auth.signInAnonymously();
+
+    if (error) {
+      setMessage(error.message);
+      setBusy(false);
+      return;
+    }
+
+    if (data.session) router.replace("/dashboard");
+  }
+
   return <main className="auth-page">
     <section className="auth-story">
       <a className="brand auth-brand" href="/"><span>DL</span> DecisionLab</a>
@@ -88,6 +102,8 @@ export function LoginForm() {
         {message && <p className="auth-message" role="status">{message}</p>}
         <div className="auth-divider"><span>or</span></div>
         <button className="google-button" onClick={signInWithGoogle} disabled={busy}><b>G</b> Continue with Google</button>
+        <button className="guest-button" onClick={playAsGuest} disabled={busy}>Play as a guest <span>→</span></button>
+        <p className="guest-note">No account needed. Guest progress stays in this browser until you sign out or clear its data.</p>
         <button className="auth-switch" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setMessage(""); }}>
           {mode === "signin" ? "New to DecisionLab? Create an account" : "Already have an account? Sign in"}
         </button>

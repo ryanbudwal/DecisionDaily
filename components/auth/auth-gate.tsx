@@ -9,6 +9,8 @@ import { supabase } from "@/lib/supabase";
 type AuthContextValue = {
   user: User;
   profileName: string;
+  isGuest: boolean;
+  canManageChallenges: boolean;
   signOut: () => Promise<void>;
 };
 
@@ -24,6 +26,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [profileName, setProfileName] = useState("");
+  const [canManageChallenges, setCanManageChallenges] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -34,18 +37,19 @@ export function AuthGate({ children }: { children: ReactNode }) {
       setUser(nextUser);
       if (!nextUser) {
         setProfileName("");
+        setCanManageChallenges(false);
         setReady(true);
         router.replace("/");
         return;
       }
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("username")
-        .eq("id", nextUser.id)
-        .maybeSingle();
+      const [profileResult, managerResult] = await Promise.all([
+        supabase.from("profiles").select("username").eq("id", nextUser.id).maybeSingle(),
+        supabase.rpc("can_manage_challenges"),
+      ]);
       if (!active) return;
-      setProfileName(data?.username ?? "");
+      setProfileName(profileResult.data?.username ?? "");
+      setCanManageChallenges(managerResult.data === true);
       setReady(true);
     }
 
@@ -63,11 +67,13 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const value = useMemo<AuthContextValue | null>(() => user ? {
     user,
     profileName,
+    isGuest: user.is_anonymous === true,
+    canManageChallenges,
     signOut: async () => {
       await supabase.auth.signOut();
       router.replace("/");
     },
-  } : null, [profileName, router, user]);
+  } : null, [canManageChallenges, profileName, router, user]);
 
   if (!ready || !value) {
     return <div className="auth-loading"><span>DL</span><p>Preparing your DecisionLab workspace…</p></div>;

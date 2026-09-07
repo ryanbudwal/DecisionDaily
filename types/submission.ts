@@ -1,4 +1,5 @@
 import type { ScorePart } from "./score";
+import type { Outcome } from "./challenge";
 
 export type Submission = {
   id: number;

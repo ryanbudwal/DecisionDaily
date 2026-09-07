@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/auth/auth-gate";
 import { StreakDisplay } from "@/components/profile/streak-display";
 import { getSubmissions } from "@/lib/challenges/queries";
 import { getProfile } from "@/lib/profile/queries";
@@ -8,6 +9,7 @@ import type { Profile } from "@/types/profile";
 import type { Submission } from "@/types/submission";
 
 export default function ProfilePage() {
+  const { isGuest } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [error, setError] = useState("");
