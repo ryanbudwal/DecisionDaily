@@ -49,10 +49,7 @@ export async function getChallenge(slug: string) {
 }
 
 export async function getSubmissions() {
-  const [submissionResult, scoreResult] = await Promise.all([
-    supabase.from("challenge_submissions").select("*").order("submitted_at", { ascending: false }),
-    supabase.from("scores").select("submission_id, overall_score, scoring_breakdown"),
-  ]);
+  const submissionResult = await supabase.from("challenge_submissions").select("*").order("submitted_at", { ascending: false });
 
   if (submissionResult.error) fail(submissionResult.error.message);
   const submissions = (submissionResult.data ?? []) as Submission[];

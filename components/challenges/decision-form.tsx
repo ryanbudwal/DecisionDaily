@@ -3,11 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/auth/auth-gate";
 import { ScoreBreakdown } from "@/components/scores/score-breakdown";
 import { submitBasicDecision } from "@/lib/challenges/queries";
 import type { BasicChoice, Challenge } from "@/types/challenge";
-import type { Submission } from "@/types/submission";
+import type { BasicPracticeResult, Submission } from "@/types/submission";
 
 function ChoiceGroup({
   title,
@@ -47,10 +46,8 @@ export function DecisionForm({
   isArchivePractice: boolean;
 }) {
   const router = useRouter();
-  const { user } = useAuth();
   const [decision, setDecision] = useState(challenge.decision_options[0] ?? "");
   const [allocation, setAllocation] = useState(10);
-  const [confidence, setConfidence] = useState(60);
   const [reasoningChoice, setReasoningChoice] = useState<number | null>(null);
   const [riskChoice, setRiskChoice] = useState<number | null>(null);
   const [changeChoice, setChangeChoice] = useState<number | null>(null);
@@ -68,18 +65,32 @@ export function DecisionForm({
     try {
       const result = await submitBasicDecision({
         challengeId: challenge.id,
-      decision,
-      allocation_percent: allocation,
-      confidence_percent: confidence,
-      selected_reasoning_option_id: reasoningChoice,
-      selected_risk_option_id: riskChoice,
-      selected_change_option_id: changeChoice,
-    });
-
-    if (submitError) {
-      setError(submitError.code === "23505" ? "This decision is already locked." : submitError.message);
+        decision,
+        allocationPercent: allocation,
+        reasoningOptionId: reasoningChoice!,
+        riskOptionId: riskChoice!,
+        changeOptionId: changeChoice!,
+      });
+      if (result.status === "practice") {
+        setPracticeResult(result);
+      } else {
+        router.push(`/challenge/${challenge.slug}/results`);
+      }
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Could not submit your decision.");
+    } finally {
       setSubmitting(false);
     }
+  }
+
+  if (practiceResult) {
+    return <div className="decision-complete">
+      <div className="reveal-label">Practice result</div>
+      <h2>Your process score: {practiceResult.score}/100</h2>
+      <p>{practiceResult.outcome?.outcome_summary ?? "The outcome is unavailable."}</p>
+      <ScoreBreakdown breakdown={practiceResult.scoring_breakdown} />
+      <button className="lock-decision" onClick={() => setPracticeResult(null)}>Try again</button>
+    </div>;
   }
 
   if (submission) {
@@ -111,9 +122,7 @@ export function DecisionForm({
     <label className="form-label"><span>Capital at risk</span><b>{allocation}%</b></label>
     <input type="range" min="0" max="100" value={allocation} onChange={(event) => setAllocation(Number(event.target.value))} />
     <div className="range-scale"><span>0%</span><span>50%</span><span>100%</span></div>
-    <label className="form-label"><span>Confidence</span><b>{confidence}%</b></label>
-    <input type="range" min="1" max="100" value={confidence} onChange={(event) => setConfidence(Number(event.target.value))} />
-    <p className="calibration-note">Confidence is not certainty. Estimate honestly.</p>
+    <p className="calibration-note">Choose the cards that best reflect your reasoning.</p>
     <button className="lock-decision" disabled={!ready || submitting} onClick={submitDecision}>{submitting ? "Locking…" : "Lock decision & reveal"}<span>→</span></button>
     {!ready && <p className="form-requirement">Choose one card from each group to reveal the result.</p>}
   </>;
