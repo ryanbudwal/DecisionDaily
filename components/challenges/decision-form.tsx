@@ -39,11 +39,9 @@ function ChoiceGroup({
 export function DecisionForm({
   challenge,
   submission,
-  isArchivePractice,
 }: {
   challenge: Challenge;
   submission: Submission | null;
-  isArchivePractice: boolean;
 }) {
   const router = useRouter();
   const [decision, setDecision] = useState(challenge.decision_options[0] ?? "");

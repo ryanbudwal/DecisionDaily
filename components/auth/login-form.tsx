@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export function LoginForm() {
@@ -39,19 +40,6 @@ export function LoginForm() {
     setBusy(false);
   }
 
-  async function signInWithGoogle() {
-    setBusy(true);
-    setMessage("");
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
-    });
-    if (error) {
-      setMessage(error.message);
-      setBusy(false);
-    }
-  }
-
   async function playAsGuest() {
     setBusy(true);
     setMessage("");
@@ -68,7 +56,7 @@ export function LoginForm() {
 
   return <main className="auth-page">
     <section className="auth-story">
-      <a className="brand auth-brand" href="/"><span>DL</span> DecisionLab</a>
+      <Link className="brand auth-brand" href="/"><span>DL</span> DecisionLab</Link>
       <div>
         <div className="eyebrow"><span>One challenge. Every day.</span></div>
         <h1>Train your financial judgment.</h1>
@@ -101,7 +89,6 @@ export function LoginForm() {
         </form>
         {message && <p className="auth-message" role="status">{message}</p>}
         <div className="auth-divider"><span>or</span></div>
-        <button className="google-button" onClick={signInWithGoogle} disabled={busy}><b>G</b> Continue with Google</button>
         <button className="guest-button" onClick={playAsGuest} disabled={busy}>Play as a guest <span>→</span></button>
         <p className="guest-note">No account needed. Guest progress stays in this browser until you sign out or clear its data.</p>
         <button className="auth-switch" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setMessage(""); }}>

@@ -6,7 +6,7 @@ DecisionLab is a daily financial decision-making platform inspired by Wordle. Ev
 
 - One shared daily challenge
 - Email/password authentication through Supabase
-- Google sign-in button (requires Google OAuth credentials in Supabase)
+- Email/password accounts and optional guest play
 - Locked, one-time submissions
 - Deterministic reasoning and risk-management score
 - Outcome hidden until submission
@@ -22,6 +22,23 @@ Copy `.env.example` to `.env.local` and add the project's public Supabase URL an
 npm install
 npm run dev
 ```
+
+## Release checks and deployment
+
+Run the full local release gate before deploying:
+
+```bash
+npm run check
+npm run deploy:dry-run
+```
+
+Deploy the generated Worker to Cloudflare with:
+
+```bash
+npm run deploy
+```
+
+Before a public launch, configure the production site URL and allowed redirect URLs in Supabase Auth, enable anonymous sign-ins for guest mode, and configure a production SMTP provider for account-confirmation and password-reset mail. Keep Google OAuth disabled unless the Google sign-in UI is restored.
 
 The browser is allowed to receive the Supabase URL and publishable key. Security is enforced in Postgres with row-level security; private keys remain only in Supabase's dashboard.
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ScoreBreakdown } from "@/components/scores/score-breakdown";
-import { getChallenge, getCurrentReleaseDate, getOutcome, getSubmission } from "@/lib/challenges/queries";
+import { getChallenge, getOutcome, getSubmission } from "@/lib/challenges/queries";
 import type { Challenge, Outcome } from "@/types/challenge";
 import type { Submission } from "@/types/submission";
 
@@ -14,16 +14,14 @@ export default function ResultsPage() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
-  const [releaseDate, setReleaseDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    void Promise.all([getChallenge(slug), getCurrentReleaseDate()])
-      .then(async ([nextChallenge, nextReleaseDate]) => {
+    void getChallenge(slug)
+      .then(async (nextChallenge) => {
         if (!nextChallenge) return;
         setChallenge(nextChallenge);
-        setReleaseDate(nextReleaseDate);
         const nextSubmission = await getSubmission(nextChallenge.id);
         if (!nextSubmission) {
           router.replace(`/challenge/${slug}`);

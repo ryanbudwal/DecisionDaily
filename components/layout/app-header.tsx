@@ -26,13 +26,13 @@ export function AppHeader() {
   return <header className="app-header">
     <Link className="brand" href="/dashboard"><span>DL</span> DecisionLab</Link>
     <nav aria-label="Primary navigation">
-      {links.map((link) => <Link
+      {visibleLinks.map((link) => <Link
         key={link.href}
         href={link.href}
         className={pathname === link.href || (link.href === "/dashboard" && pathname.startsWith("/challenge/")) ? "active" : ""}
       >{link.label}</Link>)}
     </nav>
-    <button className="auth-signout" onClick={() => void signOut()} title={profileName || user.email || "Signed in"}>
+    <button className="auth-signout" onClick={() => void handleSignOut()} title={profileName || user.email || "Signed in"}>
       <span>{(profileName?.[0] ?? user.email?.[0] ?? "D").toUpperCase()}</span> Sign out
     </button>
   </header>;

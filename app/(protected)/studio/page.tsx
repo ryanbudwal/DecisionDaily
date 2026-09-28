@@ -60,7 +60,7 @@ export default function ChallengeStudioPage() {
   const [drafts, setDrafts] = useState<ChallengeDraft[]>([]);
   const [draft, setDraft] = useState<ChallengeDraft>(() => blankDraft());
   const [releaseDate, setReleaseDate] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(canManageChallenges);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -74,8 +74,18 @@ export default function ChallengeStudioPage() {
   }
 
   useEffect(() => {
-    if (!canManageChallenges) { setLoading(false); return; }
-    void loadStudio().catch((reason: Error) => setError(reason.message)).finally(() => setLoading(false));
+    if (!canManageChallenges) return;
+    let active = true;
+    void Promise.all([getChallengeStudio(), getCurrentReleaseDate()])
+      .then(([items, today]) => {
+        if (!active) return;
+        setDrafts(items);
+        setReleaseDate(today);
+        setDraft((current) => current.publish_date ? current : { ...current, publish_date: today });
+      })
+      .catch((reason: Error) => { if (active) setError(reason.message); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [canManageChallenges]);
 
   const unpublished = useMemo(() => drafts.filter((item) => !item.is_published && item.challenge_mode === track), [drafts, track]);
