@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChallengeCard } from "@/components/challenges/challenge-card";
 import { getChallenges, getCurrentReleaseDate, getSubmissions } from "@/lib/challenges/queries";
 import type { Challenge } from "@/types/challenge";
@@ -22,8 +22,8 @@ export default function ArchivePage() {
       .catch((reason: Error) => setError(reason.message));
   }, []);
 
-  const basicArchive = useMemo(() => challenges.filter((item) => item.challenge_mode !== "advanced"), [challenges]);
-  const advancedArchive = useMemo(() => challenges.filter((item) => item.challenge_mode === "advanced"), [challenges]);
+  const basicArchive = challenges.filter((item) => item.challenge_mode !== "advanced");
+  const advancedArchive = challenges.filter((item) => item.challenge_mode === "advanced");
   const completionRate = challenges.length ? Math.round((submissions.length / challenges.length) * 100) : 0;
   const averageScore = submissions.length ? Math.round(submissions.reduce((sum, item) => sum + item.score, 0) / submissions.length) : 0;
 

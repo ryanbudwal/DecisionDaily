@@ -35,10 +35,6 @@ export default function DashboardPage() {
 
   const basicCompleted = basicChallenge ? submissions.find((item) => item.challenge_id === basicChallenge.id) : undefined;
   const advancedCompleted = advancedChallenge ? submissions.find((item) => item.challenge_id === advancedChallenge.id) : undefined;
-  const averageScore = submissions.length
-    ? Math.round(submissions.reduce((sum, item) => sum + item.score, 0) / submissions.length)
-    : 0;
-
   return <section className="dashboard-page">
     {isGuest && <aside className="guest-session-note"><span>Guest mode</span><p>Your decisions are private and saved in this browser, but they will not follow you to another device.</p></aside>}
     <div className="dashboard-intro">
@@ -76,10 +72,5 @@ export default function DashboardPage() {
       </Link>
     </article> : <article className="advanced-mode-card release-empty-card"><div><span className="daily-sequence">Advanced Weekly</span><h2>No active weekly release</h2><p>Return when the next deep-analysis challenge is published.</p></div><Link className="advanced-mode-link" href="/archive">Explore advanced archive →</Link></article>}
 
-    <div className="dashboard-stats">
-      <article><span>Completed</span><b>{submissions.length}</b><small>Locked decisions</small></article>
-      <article><span>Average score</span><b>{averageScore || "—"}</b><small>Decision process</small></article>
-      <article><span>Practice library</span><b>∞</b><small>Challenges stay available</small></article>
-    </div>
   </section>;
 }

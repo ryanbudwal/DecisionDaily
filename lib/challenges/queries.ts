@@ -4,22 +4,20 @@ import type { ScoreRecord } from "@/types/score";
 import type { BasicDecisionResponse, Submission } from "@/types/submission";
 import type { ChallengeDraft } from "@/types/challenge-studio";
 
-function fail(message: string): never {
-  throw new Error(message);
-}
+const submissionFields = "id, challenge_id, decision, allocation_percent, confidence_percent, submission_mode, reasoning, risks, change_my_mind, score, scoring_breakdown";
 
 export async function getChallenges() {
   const { data, error } = await supabase
     .from("daily_challenges")
     .select("*")
     .order("publish_date", { ascending: false });
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   return (data ?? []) as Challenge[];
 }
 
 export async function getCurrentReleaseDate() {
   const { data, error } = await supabase.rpc("current_release_date");
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   return data as string;
 }
 
@@ -29,16 +27,16 @@ export async function getChallenge(slug: string) {
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   if (!data) return null;
 
   const challenge = data as Challenge;
   const { data: choiceData, error: choiceError } = await supabase
     .from("basic_choice_options")
-    .select("id, challenge_id, prompt_type, option_key, option_text, display_order")
+    .select("id, prompt_type, option_text")
     .eq("challenge_id", challenge.id)
     .order("display_order", { ascending: true });
-  if (choiceError) fail(choiceError.message);
+  if (choiceError) throw new Error(choiceError.message);
 
   const basicChoices: BasicChoiceGroups = { reasoning: [], risk: [], change_mind: [] };
   for (const choice of (choiceData ?? []) as BasicChoice[]) {
@@ -49,9 +47,12 @@ export async function getChallenge(slug: string) {
 }
 
 export async function getSubmissions() {
-  const submissionResult = await supabase.from("challenge_submissions").select("*").order("submitted_at", { ascending: false });
+  const submissionResult = await supabase
+    .from("challenge_submissions")
+    .select(submissionFields)
+    .order("submitted_at", { ascending: false });
 
-  if (submissionResult.error) fail(submissionResult.error.message);
+  if (submissionResult.error) throw new Error(submissionResult.error.message);
   const submissions = (submissionResult.data ?? []) as Submission[];
   if (submissions.length === 0) return [];
 
@@ -59,7 +60,7 @@ export async function getSubmissions() {
     .from("scores")
     .select("submission_id, overall_score, scoring_breakdown")
     .in("submission_id", submissions.map((submission) => submission.id));
-  if (scoreResult.error) fail(scoreResult.error.message);
+  if (scoreResult.error) throw new Error(scoreResult.error.message);
 
   const scoreBySubmission = new Map(
     ((scoreResult.data ?? []) as ScoreRecord[]).map((score) => [score.submission_id, score]),
@@ -89,35 +90,35 @@ export async function submitBasicDecision(input: {
     risk_option_id: input.riskOptionId,
     change_option_id: input.changeOptionId,
   });
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   return data as BasicDecisionResponse;
 }
 
 export async function getChallengeStudio() {
   const { data, error } = await supabase.rpc("list_challenge_studio");
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   return (data ?? []) as ChallengeDraft[];
 }
 
 export async function saveChallengeDraft(draft: ChallengeDraft) {
   const { data, error } = await supabase.rpc("save_challenge_draft", { payload: draft });
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   return data as number;
 }
 
 export async function publishChallenge(challengeId: number) {
   const { data, error } = await supabase.rpc("publish_challenge", { challenge_id: challengeId });
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   return data as { status: "published"; publish_date: string };
 }
 
 export async function getSubmission(challengeId: number) {
   const { data, error } = await supabase
     .from("challenge_submissions")
-    .select("*")
+    .select(submissionFields)
     .eq("challenge_id", challengeId)
     .maybeSingle();
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   if (!data) return null;
 
   const submission = data as Submission;
@@ -126,7 +127,7 @@ export async function getSubmission(challengeId: number) {
     .select("submission_id, overall_score, scoring_breakdown")
     .eq("submission_id", submission.id)
     .maybeSingle();
-  if (scoreError) fail(scoreError.message);
+  if (scoreError) throw new Error(scoreError.message);
 
   const score = scoreData as ScoreRecord | null;
   return score
@@ -140,6 +141,6 @@ export async function getOutcome(challengeId: number) {
     .select("*")
     .eq("challenge_id", challengeId)
     .maybeSingle();
-  if (error) fail(error.message);
+  if (error) throw new Error(error.message);
   return (data as Outcome | null) ?? null;
 }

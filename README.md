@@ -1,18 +1,25 @@
 # DecisionDaily
 
-DecisionLab is a daily financial decision-making platform inspired by Wordle. Every signed-in user receives the same challenge each day, submits a decision and written reasoning before seeing the outcome, and is scored on decision quality rather than profit alone.
+DecisionLab is a shared financial decision-making game. Players choose cards in a Basic Daily challenge or write an analysis for an Advanced Weekly challenge. The outcome stays hidden until they submit, and the score measures their decision process.
 
 ## Current product
 
-- One shared daily challenge
-- Email/password authentication through Supabase
-- Email/password accounts and optional guest play
-- Locked, one-time submissions
+- Shared Basic Daily and Advanced Weekly challenges
+- Email/password accounts and optional guest play through Supabase
+- Locked official submissions and repeatable archive practice
 - Deterministic reasoning and risk-management score
 - Outcome hidden until submission
 - Permanent chronological archive
 - Practice access to missed challenges
 - Private per-user submission history
+
+## Project map
+
+- `app/` contains the Next.js routes and global styles.
+- `components/` contains shared auth, challenge, layout, profile, and score UI.
+- `lib/` contains the Supabase client and database queries used by those routes.
+- `types/` describes the data each UI flow reads or writes.
+- `supabase/schema.sql` bootstraps the database; `supabase/migrations/` evolves it; `supabase/tests/` holds database checks.
 
 ## Local setup
 
@@ -25,18 +32,13 @@ npm run dev
 
 ## Release checks and deployment
 
-Run the full local release gate before deploying:
+Run the local release checks before deploying:
 
 ```bash
 npm run check
-npm run deploy:dry-run
 ```
 
-Deploy the generated Worker to Cloudflare with:
-
-```bash
-npm run deploy
-```
+To deploy on Vercel, import this repository as a Next.js project. Vercel detects the framework and uses `npm run build` automatically. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` under the project's Environment Variables for Development, Preview, and Production, then deploy. The same values can be set locally in `.env.local`.
 
 Before a public launch, configure the production site URL and allowed redirect URLs in Supabase Auth, enable anonymous sign-ins for guest mode, and configure a production SMTP provider for account-confirmation and password-reset mail. Keep Google OAuth disabled unless the Google sign-in UI is restored.
 
@@ -44,6 +46,6 @@ The browser is allowed to receive the Supabase URL and publishable key. Security
 
 ## Database
 
-The schema scaffold is documented in [`supabase/schema.sql`](supabase/schema.sql), while the timestamped files under [`supabase/migrations`](supabase/migrations) are the source of truth for the deployed database. Challenge outcomes are stored separately from prompts so row-level security can keep them hidden until the current user submits. Submissions have no update or delete policy, making each decision append-only and locked.
+[`supabase/schema.sql`](supabase/schema.sql) is the initial database schema. Apply it before the timestamped files under [`supabase/migrations`](supabase/migrations), in order. The migrations evolve that baseline into the current schema; the initial file is not a snapshot of the current database. Challenge outcomes are stored separately from prompts so row-level security can keep them hidden until the current user submits. Submissions have no update or delete policy, making each decision append-only and locked.
 
-Each publish date has one shared scenario. Past scenarios remain in chronological order for practice.
+Published scenarios remain in chronological order for practice.

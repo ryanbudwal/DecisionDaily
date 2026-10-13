@@ -15,7 +15,7 @@ export function AppHeader() {
   const pathname = usePathname();
   const { user, profileName, isGuest, canManageChallenges, signOut } = useAuth();
   const visibleLinks = canManageChallenges
-    ? [...links, { href: "/studio", label: "Challenge studio", shortLabel: "Studio", icon: "05" }]
+    ? [...links, { href: "/studio", label: "Challenge studio" }]
     : links;
 
   async function handleSignOut() {
@@ -32,8 +32,6 @@ export function AppHeader() {
         className={pathname === link.href || (link.href === "/dashboard" && pathname.startsWith("/challenge/")) ? "active" : ""}
       >{link.label}</Link>)}
     </nav>
-    <button className="auth-signout" onClick={() => void handleSignOut()} title={profileName || user.email || "Signed in"}>
-      <span>{(profileName?.[0] ?? user.email?.[0] ?? "D").toUpperCase()}</span> Sign out
-    </button>
+    <button className="auth-signout" onClick={() => void handleSignOut()} title={profileName || user.email || "Signed in"}>Sign out</button>
   </header>;
 }

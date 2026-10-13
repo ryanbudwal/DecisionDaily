@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/auth-gate";
 import { getChallengeStudio, getCurrentReleaseDate, publishChallenge, saveChallengeDraft } from "@/lib/challenges/queries";
 import type { Evidence } from "@/types/challenge";
@@ -43,14 +43,15 @@ function slugify(value: string) {
   return value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function normalizeDraft(draft: ChallengeDraft): ChallengeDraft {
+function editableDraft(item: ChallengeDraft): ChallengeDraft {
   return {
-    ...draft,
-    source_note: draft.source_note ?? "",
-    evidence: draft.evidence.map((item) => ({ ...item })),
-    decision_options: [...draft.decision_options],
-    basic_choices: draft.basic_choices.map((item) => ({ ...item })),
-    outcome: { ...draft.outcome, learning_points: [...draft.outcome.learning_points] },
+    ...item,
+    source_note: item.source_note ?? "",
+    outcome: {
+      ...item.outcome,
+      benchmark_label: item.outcome.benchmark_label ?? "",
+      benchmark_result: item.outcome.benchmark_result ?? "",
+    },
   };
 }
 
@@ -88,8 +89,8 @@ export default function ChallengeStudioPage() {
     return () => { active = false; };
   }, [canManageChallenges]);
 
-  const unpublished = useMemo(() => drafts.filter((item) => !item.is_published && item.challenge_mode === track), [drafts, track]);
-  const published = useMemo(() => drafts.filter((item) => item.is_published && (item.challenge_mode === track || item.challenge_mode === "both")), [drafts, track]);
+  const unpublished = drafts.filter((item) => !item.is_published && item.challenge_mode === track);
+  const published = drafts.filter((item) => item.is_published && (item.challenge_mode === track || item.challenge_mode === "both"));
 
   function setField<K extends keyof ChallengeDraft>(field: K, value: ChallengeDraft[K]) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -116,7 +117,7 @@ export default function ChallengeStudioPage() {
       const id = await saveChallengeDraft(draft);
       const items = await loadStudio();
       const saved = items.find((item) => item.id === id);
-      if (saved) setDraft(normalizeDraft(saved));
+      if (saved) setDraft(editableDraft(saved));
       setNotice(`Challenge #${saved?.challenge_number ?? id} saved as a private draft.`);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "The draft could not be saved.");
@@ -156,7 +157,7 @@ export default function ChallengeStudioPage() {
         {unpublished.length === 0 && <p>No drafts yet.</p>}
         {unpublished.map((item) => <article key={item.id} className={draft.id === item.id ? "active" : ""}>
           <small>{item.publish_date}</small><h2>{item.title}</h2><p>Challenge #{String(item.challenge_number).padStart(3, "0")}</p>
-          <div><button type="button" onClick={() => { setTrack(item.challenge_mode === "advanced" ? "advanced" : "basic"); setDraft(normalizeDraft(item)); setError(""); setNotice(""); }}>Edit</button><button type="button" className="publish" disabled={saving} onClick={() => void handlePublish(item)}>Publish</button></div>
+          <div><button type="button" onClick={() => { setTrack(item.challenge_mode === "advanced" ? "advanced" : "basic"); setDraft(editableDraft(item)); setError(""); setNotice(""); }}>Edit</button><button type="button" className="publish" disabled={saving} onClick={() => void handlePublish(item)}>Publish</button></div>
         </article>)}
         <div className="studio-published-title"><span>Published</span><b>{published.length}</b></div>
         {published.slice(0, 8).map((item) => <article key={item.id} className="published"><small>{item.publish_date}</small><h2>{item.title}</h2><p>Challenge #{String(item.challenge_number).padStart(3, "0")} · Live</p></article>)}

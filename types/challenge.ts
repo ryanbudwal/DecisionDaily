@@ -7,11 +7,8 @@ export type Evidence = {
 
 export type BasicChoice = {
   id: number;
-  challenge_id: number;
   prompt_type: "reasoning" | "risk" | "change_mind";
-  option_key: string;
   option_text: string;
-  display_order: number;
 };
 
 export type BasicChoiceGroups = {
@@ -26,7 +23,6 @@ export type Challenge = {
   slug: string;
   challenge_number: number;
   publish_date: string;
-  difficulty: "beginner" | "intermediate" | "advanced";
   title: string;
   subtitle: string;
   scenario: string;
