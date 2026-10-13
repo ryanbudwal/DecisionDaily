@@ -1,0 +1,56 @@
+{
+  "challenge_mode": "basic",
+  "release_timezone": "America/Toronto",
+  "cases": [
+    {
+      "publish_date": "2026-10-13",
+      "slug": "grocer-price-war",
+      "title": "The grocery price war"
+    },
+    {
+      "publish_date": "2026-10-14",
+      "slug": "solar-factory-expansion",
+      "title": "The solar factory expansion"
+    },
+    {
+      "publish_date": "2026-10-15",
+      "slug": "software-renewal-warning",
+      "title": "The software renewal warning"
+    },
+    {
+      "publish_date": "2026-10-16",
+      "slug": "municipal-bond-refinancing",
+      "title": "The municipal bond refinancing"
+    },
+    {
+      "publish_date": "2026-10-17",
+      "slug": "regional-bank-deposit-shift",
+      "title": "The regional bank deposit shift"
+    },
+    {
+      "publish_date": "2026-10-18",
+      "slug": "delivery-fleet-conversion",
+      "title": "The delivery fleet conversion"
+    },
+    {
+      "publish_date": "2026-10-19",
+      "slug": "insurer-storm-exposure",
+      "title": "The insurer's storm exposure"
+    },
+    {
+      "publish_date": "2026-10-20",
+      "slug": "medical-device-quality-hold",
+      "title": "The medical device quality hold"
+    },
+    {
+      "publish_date": "2026-10-21",
+      "slug": "retailer-inventory-glut",
+      "title": "The retailer's inventory glut"
+    },
+    {
+      "publish_date": "2026-10-22",
+      "slug": "automation-backlog-timing",
+      "title": "The automation backlog timing"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ DecisionLab is a shared financial decision-making game. Players choose cards in 
 - `lib/` contains the Supabase client and database queries used by those routes.
 - `types/` describes the data each UI flow reads or writes.
 - `supabase/schema.sql` bootstraps the database; `supabase/migrations/` evolves it; `supabase/tests/` holds database checks.
+- `content/` holds a public-safe index of scheduled challenges.
 
 ## Local setup
 
@@ -49,3 +50,9 @@ The browser is allowed to receive the Supabase URL and publishable key. Security
 [`supabase/schema.sql`](supabase/schema.sql) is the initial database schema. Apply it before the timestamped files under [`supabase/migrations`](supabase/migrations), in order. The migrations evolve that baseline into the current schema; the initial file is not a snapshot of the current database. Challenge outcomes are stored separately from prompts so row-level security can keep them hidden until the current user submits. Submissions have no update or delete policy, making each decision append-only and locked.
 
 Published scenarios remain in chronological order for practice.
+
+## Scheduled Basic Daily scenarios
+
+[`content/basic-daily-2026-10-13.json`](content/basic-daily-2026-10-13.json) lists the ten simulated cases scheduled in the DecisionDaily Supabase project for October 13–22, 2026. The complete prompts, evidence, choice cards, private scores, and outcomes are stored in Supabase. The index omits unreleased scenario text and protected answers so publishing the repository does not reveal them. All companies and figures in this batch are fictional.
+
+The October 13 case is available now. The other cases are stored as published releases, but database row-level security reveals each one to players only on or after its `publish_date`, using the America/Toronto release date. Outcomes remain hidden until the player submits a decision.
