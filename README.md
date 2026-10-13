@@ -1,6 +1,6 @@
-# DecisionDaily
+# Decision Daily
 
-DecisionLab is a shared financial decision-making game. Players choose cards in a Basic Daily challenge or write an analysis for an Advanced Weekly challenge. The outcome stays hidden until they submit, and the score measures their decision process.
+Decision Daily is a shared financial decision-making game. Players choose cards in a Basic Daily challenge or write an analysis for an Advanced Weekly challenge. The outcome stays hidden until they submit, and the score measures their decision process.
 
 ## Current product
 

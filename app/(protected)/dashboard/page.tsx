@@ -29,7 +29,7 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="route-loading"><span>DL</span><p>Loading today&apos;s challenge…</p></div>;
+  if (loading) return <div className="route-loading"><span>DD</span><p>Loading today&apos;s challenge…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
   if (!basicChallenge && !advancedChallenge) return <section className="dashboard-page"><div className="dashboard-intro"><span className="section-kicker">No current release</span><h1>The archive is open.</h1><p>There is no Eastern-dated Basic Daily or active Advanced Weekly challenge right now. Practise a past scenario while you wait for the next release.</p></div><Link className="primary-link" href="/archive">Explore the archive →</Link></section>;
 

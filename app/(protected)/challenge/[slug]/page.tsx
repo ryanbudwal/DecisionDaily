@@ -26,7 +26,7 @@ export default function ChallengePage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  if (loading) return <div className="route-loading"><span>DL</span><p>Preparing the evidence…</p></div>;
+  if (loading) return <div className="route-loading"><span>DD</span><p>Preparing the evidence…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
   if (!challenge) return <div className="route-error">This challenge could not be found.</div>;
   if (challenge.challenge_mode === "advanced") return <div className="route-error">This is an Advanced Weekly challenge. Open it from the Advanced section.</div>;

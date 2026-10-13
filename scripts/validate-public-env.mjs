@@ -10,7 +10,7 @@ const required = [
 for (const name of required) {
   const value = process.env[name];
   if (!value || value.includes("your-project") || value.includes("your-supabase")) {
-    throw new Error(`${name} must be configured before building DecisionLab.`);
+    throw new Error(`${name} must be configured before building Decision Daily.`);
   }
 }
 

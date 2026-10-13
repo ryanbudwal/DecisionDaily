@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 export function LoginForm() {
@@ -36,7 +35,7 @@ export function LoginForm() {
 
     if (result.error) setMessage(result.error.message);
     else if (result.data.session) router.replace("/dashboard");
-    else setMessage("Check your email to confirm your DecisionLab account.");
+    else setMessage("Check your email to confirm your Decision Daily account.");
     setBusy(false);
   }
 
@@ -55,25 +54,10 @@ export function LoginForm() {
   }
 
   return <main className="auth-page">
-    <section className="auth-story">
-      <Link className="brand auth-brand" href="/"><span>DL</span> DecisionLab</Link>
-      <div>
-        <div className="eyebrow"><span>One challenge. Every day.</span></div>
-        <h1>Train your financial judgment.</h1>
-        <p>Everyone gets the same scenario. Study the evidence, commit your reasoning, and reveal what happened—then come back tomorrow.</p>
-        <div className="auth-proof">
-          <article><b>01</b><span>Analyze the evidence</span></article>
-          <article><b>02</b><span>Lock your decision</span></article>
-          <article><b>03</b><span>Improve your process</span></article>
-        </div>
-      </div>
-      <small>Educational practice only · No investment advice</small>
-    </section>
-
     <section className="auth-form-wrap">
       <div className="auth-form-card">
         <span className="auth-kicker">Today&apos;s challenge is waiting</span>
-        <h2>{mode === "signin" ? "Welcome back" : "Join DecisionLab"}</h2>
+        <h2>{mode === "signin" ? "Welcome back" : "Join Decision Daily"}</h2>
         <p>{mode === "signin" ? "Sign in to protect your streak and private decision journal." : "Create a private account to save every decision."}</p>
         <form onSubmit={submitEmail}>
           <label htmlFor="auth-email">Email address</label>
@@ -92,7 +76,7 @@ export function LoginForm() {
         <button className="guest-button" onClick={playAsGuest} disabled={busy}>Play as a guest <span>→</span></button>
         <p className="guest-note">No account needed. Guest progress stays in this browser until you sign out or clear its data.</p>
         <button className="auth-switch" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setMessage(""); }}>
-          {mode === "signin" ? "New to DecisionLab? Create an account" : "Already have an account? Sign in"}
+          {mode === "signin" ? "New to Decision Daily? Create an account" : "Already have an account? Sign in"}
         </button>
         <p className="auth-privacy">Your decisions and reasoning are private. We never connect to a brokerage or place trades.</p>
       </div>

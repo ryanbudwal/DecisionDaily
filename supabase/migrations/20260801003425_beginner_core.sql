@@ -1,4 +1,4 @@
--- DecisionLab V1: profiles, broader challenge categories, and dedicated scores.
+-- Decision Daily V1: profiles, broader challenge categories, and dedicated scores.
 -- This migration is additive so the existing daily challenge and archive remain live.
 
 create schema if not exists private;

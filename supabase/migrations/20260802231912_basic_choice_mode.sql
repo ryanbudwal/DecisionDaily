@@ -1,4 +1,4 @@
--- DecisionLab V1: fast Basic mode with public choices and private scoring weights.
+-- Decision Daily V1: fast Basic mode with public choices and private scoring weights.
 
 create table public.basic_choice_options (
   id bigint generated always as identity primary key,

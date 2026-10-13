@@ -23,7 +23,7 @@ export default function ProfilePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="route-loading"><span>DL</span><p>Building your decision profile…</p></div>;
+  if (loading) return <div className="route-loading"><span>DD</span><p>Building your decision profile…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
 
   const averageScore = submissions.length
@@ -45,7 +45,7 @@ export default function ProfilePage() {
   return <section className="profile-page">
     <div className="profile-heading">
       <div><span className="section-kicker">Your private learning record</span><h1>Your decision profile</h1><p>Your streak, scores, and decision skills from completed challenges.</p></div>
-      <div className="profile-identity"><span>{(profile?.username ?? "D").charAt(0).toUpperCase()}</span><div><small>DecisionLab member</small><b>{profile?.username ?? "Your profile"}</b></div></div>
+      <div className="profile-identity"><span>{(profile?.username ?? "D").charAt(0).toUpperCase()}</span><div><small>Decision Daily member</small><b>{profile?.username ?? "Your profile"}</b></div></div>
     </div>
 
     <div className="profile-metrics">

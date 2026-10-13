@@ -1,4 +1,4 @@
--- DecisionLab schema reference. Apply through a reviewed Supabase migration.
+-- Decision Daily schema reference. Apply through a reviewed Supabase migration.
 
 create table public.daily_challenges (
   id bigint generated always as identity primary key,

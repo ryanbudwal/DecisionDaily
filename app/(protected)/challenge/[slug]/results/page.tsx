@@ -34,7 +34,7 @@ export default function ResultsPage() {
       .finally(() => setLoading(false));
   }, [router, slug]);
 
-  if (loading) return <div className="route-loading"><span>DL</span><p>Calculating your result…</p></div>;
+  if (loading) return <div className="route-loading"><span>DD</span><p>Calculating your result…</p></div>;
   if (error) return <div className="route-error" role="alert">{error}</div>;
   if (!challenge || !submission) return <div className="route-loading"><p>Returning to the challenge…</p></div>;
 

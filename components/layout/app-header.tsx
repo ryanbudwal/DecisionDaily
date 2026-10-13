@@ -24,7 +24,7 @@ export function AppHeader() {
   }
 
   return <header className="app-header">
-    <Link className="brand" href="/dashboard"><span>DL</span> DecisionLab</Link>
+    <Link className="brand" href="/dashboard"><span>DD</span> Decision Daily</Link>
     <nav aria-label="Primary navigation">
       {visibleLinks.map((link) => <Link
         key={link.href}

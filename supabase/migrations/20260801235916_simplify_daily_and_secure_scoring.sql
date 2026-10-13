@@ -1,4 +1,4 @@
--- DecisionLab V1: one shared daily scenario and an authoritative scoring rubric.
+-- Decision Daily V1: one shared daily scenario and an authoritative scoring rubric.
 
 drop index if exists public.daily_challenges_category_date_idx;
 

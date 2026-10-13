@@ -1,4 +1,4 @@
-# DecisionLab security notes
+# Decision Daily security notes
 
 - Never commit `.env` files, database passwords, OAuth client secrets, service-role keys, or private keys.
 - The browser client may use only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
