@@ -41,6 +41,10 @@ npm run check
 
 To deploy on Vercel, import this repository as a Next.js project. Vercel detects the framework and uses `npm run build` automatically. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` under the project's Environment Variables for Development, Preview, and Production, then deploy. The same values can be set locally in `.env.local`.
 
+Enable Web Analytics in the Vercel project dashboard. The root layout includes the Analytics component; after deployment, visit the site and navigate between pages to generate the first page views.
+
+See [`docs/production-readiness.md`](docs/production-readiness.md) for the Hobby launch checklist and remaining dashboard work.
+
 Before a public launch, configure the production site URL and allowed redirect URLs in Supabase Auth, enable anonymous sign-ins for guest mode, and configure a production SMTP provider for account-confirmation and password-reset mail. Keep Google OAuth disabled unless the Google sign-in UI is restored.
 
 The browser is allowed to receive the Supabase URL and publishable key. Security is enforced in Postgres with row-level security; private keys remain only in Supabase's dashboard.

@@ -2,7 +2,9 @@
   "name": "decisiondaily",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": ">=22.13.0" },
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "node scripts/validate-public-env.mjs && next build",
@@ -13,7 +15,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "2.55.0",
-    "next": "16.3.6",
+    "@vercel/analytics": "2.0.1",
+    "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
@@ -22,7 +25,7 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.3.6",
+    "eslint-config-next": "16.4.0",
     "typescript": "5.9.3"
   },
   "type": "module"
